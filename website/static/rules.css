@@ -1,0 +1,131 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* BODY */
+body {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    background: #f4d35e;
+    color: #000;
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 18px;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* HEADINGS */
+h2 {
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    color: #f4d35e;
+}
+
+/* PARAGRAPH */
+p {
+    margin-bottom: 20px;
+    color: #d6e4ff;
+}
+
+/* TABLE STYLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* TABLE HEAD */
+th {
+    background: rgba(244, 211, 94, 0.9);
+    color: #000;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* TABLE CELLS */
+td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ROW HOVER */
+tr:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* LAST ROW BORDER FIX */
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* DISCLAIMER */
+.disclaimer {
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 8px;
+
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+
+    color: #ffd6d6;
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    th, td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+.sources {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.sources li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.sources a {
+    color: #ffd54f;
+    text-decoration: none;
+}
+
+.sources a:hover {
+    text-decoration: underline;
+}
