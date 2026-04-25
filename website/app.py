@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify, redirect, session, make_response
-from model import predict_risk
-from rules import rule_check
-from user_service import create_user, login_user
-from db import records_collection, users_collection
+from .model import predict_risk
+from .rules import rule_check
+from .user_service import create_user, login_user
+from .db import records_collection, users_collection
 from datetime import datetime
 import json
 import os
