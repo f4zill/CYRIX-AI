@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYRIX • Pricing & Plans</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1208;
+      --panel: #211a0e;
+      --card: #2a2010;
+      --card-alt: #241c0c;
+      --amber: #e8a835;
+      --amber-soft: #e8a83522;
+      --amber-glow: #e8a83540;
+      --terracotta: #c8613a;
+      --terra-soft: #c8613a22;
+      --sage: #7a9e6e;
+      --sage-soft: #7a9e6e1a;
+      --cream: #f0e6cc;
+      --text: #ede4cf;
+      --muted: #a09070;
+      --border: rgba(232, 168, 53, 0.12);
+      --border-warm: rgba(232, 168, 53, 0.25);
+      --warn: #d4843a;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 10% 0%, #2e1f0820 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 90% 100%, #1a100620 0%, transparent 60%);
+      overflow-x: hidden;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(33,26,14,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0; z-index: 10;
+    }
+    .brand { display: flex; flex-direction: column; }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 800;
+      letter-spacing: 4px; color: var(--amber);
+    }
+    .logo-sub {
+      font-size: 9px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 10px;
+      border: 1px solid var(--border);
+      background: none; color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .back-btn:hover { border-color: var(--border-warm); color: var(--cream); }
+
+    /* ─── HERO ─── */
+    .hero {
+      text-align: center;
+      padding: 72px 32px 52px;
+      position: relative;
+    }
+    .hero-glow {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 340px;
+      background: radial-gradient(ellipse at center, rgba(232,168,53,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--amber);
+      margin-bottom: 22px; opacity: 0.85;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--amber);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(232,168,53,0.15); }
+      50% { box-shadow: 0 0 0 6px transparent; }
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 800; color: var(--cream);
+      line-height: 1.12; margin-bottom: 18px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 16px; color: var(--muted);
+      max-width: 500px; margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+
+    /* ─── TOGGLE ─── */
+    .billing-toggle {
+      display: inline-flex; align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 5px;
+    }
+    .toggle-btn {
+      padding: 10px 26px; border-radius: 10px;
+      border: none; background: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted); cursor: pointer;
+      transition: all 0.25s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toggle-btn.active {
+      background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+      color: #1a0e00; font-weight: 600;
+    }
+    .save-pill {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(122,158,110,0.22);
+      color: var(--sage);
+      border: 1px solid rgba(122,158,110,0.3);
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── PLANS GRID ─── */
+    .plans-wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 52px 32px 72px;
+    }
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.08fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ─── CARD ─── */
+    .plan-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 34px 28px 30px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      display: flex; flex-direction: column;
+      animation: fadeUp 0.5s ease both;
+    }
+    .plan-card:nth-child(1) { animation-delay: 0.05s; }
+    .plan-card:nth-child(2) { animation-delay: 0.15s; }
+    .plan-card:nth-child(3) { animation-delay: 0.25s; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .plan-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .plan-card.free::after {
+      background: linear-gradient(90deg, transparent, var(--muted), transparent);
+      opacity: 0.4;
+    }
+    .plan-card.pro::after {
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    }
+    .plan-card.elite::after {
+      background: linear-gradient(90deg, transparent, var(--terracotta), transparent);
+    }
+
+    .plan-card.pro {
+      background: linear-gradient(160deg, #2e2410 0%, #261e0c 60%, #2a2010 100%);
+      border-color: rgba(232,168,53,0.28);
+      box-shadow: 0 0 80px rgba(232,168,53,0.07), 0 24px 48px rgba(0,0,0,0.35);
+    }
+    .plan-card:hover:not(.pro) {
+      transform: translateY(-6px);
+      border-color: var(--border-warm);
+    }
+    .plan-card.pro:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 80px rgba(232,168,53,0.12), 0 32px 56px rgba(0,0,0,0.4);
+    }
+
+    .popular-tag {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 10px; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--amber), var(--terracotta));
+      color: #1a0e00; font-weight: 700;
+    }
+
+    /* Plan Icon */
+    .plan-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 22px;
+      flex-shrink: 0;
+    }
+    .free .plan-icon  { background: rgba(160,144,112,0.12); }
+    .pro  .plan-icon  { background: rgba(232,168,53,0.13); }
+    .elite .plan-icon { background: rgba(200,97,58,0.12); }
+
+    .plan-tier {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .free  .plan-tier  { color: var(--muted); }
+    .pro   .plan-tier  { color: var(--amber); }
+    .elite .plan-tier  { color: var(--terracotta); }
+
+    .plan-desc {
+      font-size: 13.5px; color: var(--muted);
+      line-height: 1.55; margin-bottom: 26px;
+      min-height: 44px;
+    }
+
+    /* Price */
+    .price-block { margin-bottom: 30px; }
+    .price-row {
+      display: flex; align-items: flex-end; gap: 4px;
+      line-height: 1;
+    }
+    .price-currency {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 600;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .price-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 52px; font-weight: 800;
+      color: var(--cream);
+    }
+    .price-period {
+      font-size: 12px; color: var(--muted);
+      margin-top: 8px;
+    }
+    .price-was {
+      font-size: 12px; color: var(--muted);
+      text-decoration: line-through; margin-top: 4px;
+      display: none;
+    }
+    .price-save {
+      font-size: 11px; font-weight: 600;
+      color: var(--sage); margin-top: 3px;
+      display: none;
+    }
+
+    /* Features */
+    .features {
+      list-style: none;
+      margin-bottom: 30px;
+      flex: 1;
+    }
+    .features li {
+      display: flex; align-items: flex-start;
+      gap: 11px; padding: 10px 0;
+      font-size: 13.5px; color: var(--text);
+      border-bottom: 1px solid var(--border);
+      line-height: 1.45;
+    }
+    .features li:last-child { border-bottom: none; padding-bottom: 0; }
+    .features li.dim { color: var(--muted); }
+
+    .chk {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; flex-shrink: 0; margin-top: 1px;
+    }
+    .chk-grey   { background: rgba(160,144,112,0.12); color: var(--muted); }
+    .chk-amber  { background: rgba(232,168,53,0.14); color: var(--amber); }
+    .chk-terra  { background: rgba(200,97,58,0.14); color: var(--terracotta); }
+    .chk-sage   { background: rgba(122,158,110,0.14); color: var(--sage); }
+    .chk-x      { background: rgba(160,144,112,0.06); color: rgba(160,144,112,0.4); }
+
+    .limit-tag {
+      margin-left: auto; white-space: nowrap;
+      font-size: 10px; padding: 2px 9px;
+      border-radius: 999px;
+      background: rgba(212,132,58,0.12);
+      color: var(--warn);
+      letter-spacing: 0.3px; flex-shrink: 0;
+    }
+
+    /* CTA Button */
+    .plan-btn {
+      width: 100%; padding: 14px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.22s;
+      letter-spacing: 0.4px; border: none;
+    }
+    .btn-ghost {
+      background: rgba(160,144,112,0.08);
+      border: 1px solid rgba(160,144,112,0.2);
+      color: var(--muted);
+    }
+    .btn-ghost:hover {
+      background: rgba(160,144,112,0.16);
+      border-color: rgba(160,144,112,0.35);
+      color: var(--cream);
+      transform: translateY(-2px);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
+      color: #1a0e00;
+      box-shadow: 0 4px 20px rgba(232,168,53,0.2);
+    }
+    .btn-gold:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(232,168,53,0.35);
+    }
+    .btn-terra {
+      background: none;
+      border: 1px solid rgba(200,97,58,0.4);
+      color: var(--terracotta);
+    }
+    .btn-terra:hover {
+      background: var(--terra-soft);
+      border-color: rgba(200,97,58,0.65);
+      transform: translateY(-2px);
+    }
+
+    /* ─── TRUST BAR ─── */
+    .trust-bar {
+      max-width: 1060px; margin: 0 auto 60px;
+      padding: 0 32px;
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .trust-item {
+      flex: 1; min-width: 200px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 13px; color: var(--muted);
+      transition: border-color 0.2s;
+    }
+    .trust-item:hover { border-color: var(--border-warm); }
+    .trust-icon { font-size: 20px; flex-shrink: 0; }
+
+    /* ─── FAQ ─── */
+    .faq-wrap {
+      max-width: 680px; margin: 0 auto 80px;
+      padding: 0 32px;
+    }
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--muted);
+      text-align: center; margin-bottom: 28px;
+    }
+    .faq-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item:hover { border-color: var(--border-warm); }
+    .faq-q {
+      width: 100%; text-align: left;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 17px 20px;
+      background: none; border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      color: var(--cream); cursor: pointer;
+    }
+    .faq-q .chevron {
+      color: var(--muted); font-size: 12px;
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s;
+      font-size: 13.5px; color: var(--muted);
+      line-height: 1.65; padding: 0 20px;
+    }
+    .faq-item.open .faq-a  { max-height: 200px; padding: 0 20px 18px; }
+    .faq-item.open .chevron { transform: rotate(180deg); }
+
+    /* ─── FOOTER NOTE ─── */
+    .footer-note {
+      text-align: center;
+      padding: 0 32px 48px;
+      font-size: 12px; color: var(--muted);
+      line-height: 1.7;
+    }
+    .footer-note a { color: var(--amber); text-decoration: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 860px) {
+      .plans-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+    }
+    @media (max-width: 560px) {
+      header { padding: 16px 20px; }
+      .plans-wrap { padding: 36px 16px 56px; }
+      .trust-bar, .faq-wrap { padding: 0 16px; }
+      .hero { padding: 52px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="brand">
+    <div class="logo">CYRIX</div>
+    <div class="logo-sub">Health Intelligence</div>
+  </div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow">
+    <span class="eyebrow-dot"></span>
+    Pricing & Plans
+  </div>
+  <h1>Invest in Your<br><em>Health Intelligence</em></h1>
+  <p class="hero-sub">Start free, upgrade when you're ready. Every plan includes CYRIX's core risk classification engine — built for young adults who take their health seriously.</p>
+
+  <div class="billing-toggle">
+    <button class="toggle-btn active" id="btnMonthly" onclick="setBilling('monthly')">Monthly</button>
+    <button class="toggle-btn" id="btnYearly" onclick="setBilling('yearly')">
+      Yearly <span class="save-pill">Save 35%</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ PLANS ═══ -->
+<div class="plans-wrap">
+  <div class="plans-grid">
+
+    <!-- PULSE — FREE -->
+    <div class="plan-card free">
+      <div class="plan-icon">◎</div>
+      <div class="plan-tier">Pulse</div>
+      <div class="plan-desc">Start your health journey. One assessment per month, no credit card needed.</div>
+
+      <div class="price-block">
+        <div class="price-row">
+          <div class="price-amount">Free</div>
+        </div>
+        <div class="price-period">forever · no card required</div>
+      </div>
+
+      <ul class="features">
+        <li>
+          <span class="chk chk-grey">✓</span>
+          <span>Health risk assessment</span>
+          <span class="limit-tag">1× / month</span>
+        </li>
+        <li>
+          <span class="chk chk-grey">✓</span>
+          Risk classification (Low / Moderate / High)
+        </li>
+        <li>
+          <span class="chk chk-grey">✓</span>
+          Basic lifestyle recommendations
+        </li>
+        <li>
+          <span class="chk chk-grey">✓</span>
+          Manual vitals input (BP, HR, age)
+        </li>
+        <li class="dim">
+          <span class="chk chk-x">✕</span>
+          Dashboard & trend graphs
+        </li>
+        <li class="dim">
+          <span class="chk chk-x">✕</span>
+          AI-powered insights
+        </li>
+        <li class="dim">
+          <span class="chk chk-x">✕</span>
+          Health history & records
+        </li>
+      </ul>
+
+      <button class="plan-btn btn-ghost">Get Started Free</button>
+    </div>
+
+    <!-- CORE — MONTHLY / YEARLY -->
+    <div class="plan-card pro">
+      <div class="popular-tag">Most Popular</div>
+      <div class="plan-icon">◑</div>
+      <div class="plan-tier">Core</div>
+      <div class="plan-desc">Full monitoring suite for health-conscious adults who want real-time insights every day.</div>
+
+      <div class="price-block">
+        <div class="price-row">
+          <span class="price-currency" id="coreCurr">₹</span>
+          <div class="price-amount" id="coreAmt">149</div>
+        </div>
+        <div class="price-period" id="corePeriod">per month · billed monthly</div>
+        <div class="price-was" id="coreWas"></div>
+        <div class="price-save" id="coreSave"></div>
+      </div>
+
+      <ul class="features">
+        <li>
+          <span class="chk chk-amber">✓</span>
+          <strong>Unlimited</strong>&nbsp;health assessments
+        </li>
+        <li>
+          <span class="chk chk-amber">✓</span>
+          Full dashboard with trend graphs
+        </li>
+        <li>
+          <span class="chk chk-amber">✓</span>
+          Weekly health score + smart insights
+        </li>
+        <li>
+          <span class="chk chk-amber">✓</span>
+          Sleep & activity tracking
+        </li>
+        <li>
+          <span class="chk chk-amber">✓</span>
+          30-day health history
+        </li>
+        <li>
+          <span class="chk chk-amber">✓</span>
+          Hydration & daily goal tracking
+        </li>
+        <li class="dim">
+          <span class="chk chk-x">✕</span>
+          ML predictive alerts
+        </li>
+      </ul>
+
+      <button class="plan-btn btn-gold">Start Core Plan →</button>
+    </div>
+
+    <!-- ELITE -->
+    <div class="plan-card elite">
+      <div class="plan-icon">◈</div>
+      <div class="plan-tier">Elite</div>
+      <div class="plan-desc">Advanced AI, predictive risk alerts, and complete health intelligence for power users.</div>
+
+      <div class="price-block">
+        <div class="price-row">
+          <span class="price-currency" id="eliteCurr">₹</span>
+          <div class="price-amount" id="eliteAmt">349</div>
+        </div>
+        <div class="price-period" id="elitePeriod">per month · billed monthly</div>
+        <div class="price-was" id="eliteWas"></div>
+        <div class="price-save" id="eliteSave"></div>
+      </div>
+
+      <ul class="features">
+        <li>
+          <span class="chk chk-terra">✓</span>
+          Everything in Core
+        </li>
+        <li>
+          <span class="chk chk-terra">✓</span>
+          ML-powered predictive risk engine
+        </li>
+        <li>
+          <span class="chk chk-terra">✓</span>
+          Real-time anomaly & early warning alerts
+        </li>
+        <li>
+          <span class="chk chk-terra">✓</span>
+          Unlimited health history & records
+        </li>
+        <li>
+          <span class="chk chk-sage">✓</span>
+          Wearable API integration (Apple / Google Fit)
+        </li>
+        <li>
+          <span class="chk chk-sage">✓</span>
+          Priority AI health coach
+        </li>
+        <li>
+          <span class="chk chk-sage">✓</span>
+          Export PDF health reports
+        </li>
+      </ul>
+
+      <button class="plan-btn btn-terra">Go Elite →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ TRUST BAR ═══ -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <span class="trust-icon">🔒</span>
+    <span>Your health data is encrypted end-to-end and never sold to third parties.</span>
+  </div>
+  <div class="trust-item">
+    <span class="trust-icon">↩</span>
+    <span>Cancel anytime — no lock-ins, no hidden fees, no questions asked.</span>
+  </div>
+  <div class="trust-item">
+    <span class="trust-icon">⚕</span>
+    <span>Built on clinical BP & HR guidelines. Decision-support, not a replacement for doctors.</span>
+  </div>
+</div>
+
+<!-- ═══ FAQ ═══ -->
+<div class="faq-wrap">
+  <div class="section-label">Common Questions</div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      What does "1 assessment per month" mean on the free plan?
+      <span class="chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      On Pulse (free), you can run a full CYRIX health risk analysis — entering your BP, heart rate, age, and lifestyle data — once every 30 days. You'll still see your last result in the app, but to get a fresh prediction you'll need to wait for the next cycle or upgrade to Core.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      How does the yearly billing discount work?
+      <span class="chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      When you choose the yearly option, you pay for 12 months upfront at a 35% reduced rate. For Core that's ₹1,163/yr instead of ₹1,788, and for Elite ₹2,719/yr instead of ₹4,188. The savings appear before checkout.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      Is CYRIX a medical device or a substitute for a doctor?
+      <span class="chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      No. CYRIX is a decision-support system that uses rule-based and ML logic grounded in established medical guidelines (e.g., JNC-8 BP ranges). It surfaces patterns and early warning signals, but is not a diagnostic tool. Always consult a qualified physician for medical decisions.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      When will wearable integration (Apple Health / Google Fit) be available?
+      <span class="chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      Wearable API integration is listed under Elite as a future-scope feature. We're actively building it. All Elite subscribers will get access automatically when it launches — no extra charge.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      Can I upgrade or downgrade my plan at any time?
+      <span class="chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      Yes. You can upgrade instantly and your new features activate immediately. Downgrades take effect at the end of your current billing period. All your health data is retained regardless of plan.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER NOTE ═══ -->
+<div class="footer-note">
+  All prices in Indian Rupees (₹) · Taxes may apply · <a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a><br>
+  CYRIX is a student project focused on young adult health intelligence (18–35). Not a registered medical device.
+</div>
+
+<script>
+  let billing = 'monthly';
+
+  const plans = {
+    core:  { monthly: 149,  yearly: Math.round(149  * 12 * 0.65 / 12) },
+    elite: { monthly: 349,  yearly: Math.round(349  * 12 * 0.65 / 12) },
+  };
+
+  function setBilling(mode) {
+    billing = mode;
+    document.getElementById('btnMonthly').classList.toggle('active', mode === 'monthly');
+    document.getElementById('btnYearly').classList.toggle('active', mode === 'yearly');
+    updatePrices();
+  }
+
+  function updatePrices() {
+    // Core
+    const coreMonthly = plans.core.monthly;
+    const coreYearly  = plans.core.yearly;
+
+    if (billing === 'yearly') {
+      document.getElementById('coreAmt').textContent    = coreYearly;
+      document.getElementById('corePeriod').textContent = `per month · ₹${coreYearly * 12}/yr billed annually`;
+      document.getElementById('coreWas').style.display  = 'block';
+      document.getElementById('coreWas').textContent    = `Was ₹${coreMonthly}/mo`;
+      document.getElementById('coreSave').style.display = 'block';
+      document.getElementById('coreSave').textContent   = `✦ You save ₹${(coreMonthly - coreYearly) * 12}/yr`;
+    } else {
+      document.getElementById('coreAmt').textContent    = coreMonthly;
+      document.getElementById('corePeriod').textContent = 'per month · billed monthly';
+      document.getElementById('coreWas').style.display  = 'none';
+      document.getElementById('coreSave').style.display = 'none';
+    }
+
+    // Elite
+    const eliteMonthly = plans.elite.monthly;
+    const eliteYearly  = plans.elite.yearly;
+
+    if (billing === 'yearly') {
+      document.getElementById('eliteAmt').textContent    = eliteYearly;
+      document.getElementById('elitePeriod').textContent = `per month · ₹${eliteYearly * 12}/yr billed annually`;
+      document.getElementById('eliteWas').style.display  = 'block';
+      document.getElementById('eliteWas').textContent    = `Was ₹${eliteMonthly}/mo`;
+      document.getElementById('eliteSave').style.display = 'block';
+      document.getElementById('eliteSave').textContent   = `✦ You save ₹${(eliteMonthly - eliteYearly) * 12}/yr`;
+    } else {
+      document.getElementById('eliteAmt').textContent    = eliteMonthly;
+      document.getElementById('elitePeriod').textContent = 'per month · billed monthly';
+      document.getElementById('eliteWas').style.display  = 'none';
+      document.getElementById('eliteSave').style.display = 'none';
+    }
+  }
+
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

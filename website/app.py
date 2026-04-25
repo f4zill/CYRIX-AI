@@ -4,9 +4,47 @@ from rules import rule_check
 from user_service import create_user, login_user
 from db import records_collection, users_collection
 from datetime import datetime
+import json
+import os
+import uuid
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
+
+RECORDS_FILE = os.path.join(os.path.dirname(__file__), "records.json")
+
+
+# ---------------- JSON FILE HELPERS ----------------
+
+def load_json_records():
+    if not os.path.exists(RECORDS_FILE):
+        return []
+    with open(RECORDS_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+
+def save_json_records(records):
+    with open(RECORDS_FILE, "w") as f:
+        json.dump(records, f, indent=2, default=str)
+
+
+def append_json_record(entry):
+    """Prepend a new prediction entry to records.json (newest first)."""
+    records = load_json_records()
+    records.insert(0, entry)
+    save_json_records(records)
+
+
+def get_user_json_records(user_id, limit=None):
+    """Return records for a specific user, newest first."""
+    all_records = load_json_records()
+    user_records = [r for r in all_records if r.get("user_id") == user_id]
+    if limit:
+        user_records = user_records[:limit]
+    return user_records
 
 
 # ---------------- HELPERS ----------------
@@ -107,10 +145,8 @@ def dashboard():
 
     if latest:
         m = latest["metrics"]
-
         stats["heart_rate"] = m.get("heart_rate", 72)
-        stats["bp"] = f"{m.get('systolic_bp',120)}/{m.get('diastolic_bp',80)}"
-
+        stats["bp"] = f"{m.get('systolic_bp', 120)}/{m.get('diastolic_bp', 80)}"
         stats["health_score"] = (
             85 if latest["final_result"] == "LOW"
             else 65 if "MODERATE" in latest["final_result"]
@@ -125,7 +161,6 @@ def dashboard():
             stats=stats
         )
     )
-
     response.headers["Cache-Control"] = "no-store"
     return response
 
@@ -140,12 +175,12 @@ def profile():
     return render_template("profile.html", user_name=session.get("user_name", get_current_user_name()))
 
 
-@app.route("/results")
-def results():
+@app.route("/plans")
+def plans():
     guard = protect_route()
     if guard:
         return guard
-    return render_template("results.html", user_name=session.get("user_name", get_current_user_name()))
+    return render_template("plans.html", user_name=session.get("user_name", get_current_user_name()))
 
 
 @app.route("/records")
@@ -192,49 +227,86 @@ def predict():
 
         # ✅ SAFE + FRONTEND COMPATIBLE DATA
         data = {
-            "user_id": session["user_id"],
-
-            "age": int(req.get("age", 0)),
+            "user_id":      session["user_id"],
+            "age":          int(req.get("age", 0)),
 
             # ✅ STANDARDIZED KEYS (THIS IS THE FIX)
-            "systolic_bp": int(req.get("systolic_bp", req.get("trestbps", 120))),
+            "systolic_bp":  int(req.get("systolic_bp", req.get("trestbps", 120))),
             "diastolic_bp": int(req.get("diastolic_bp", 80)),
+            "heart_rate":   int(req.get("heartRate", req.get("thalach", 72))),
 
-            "heart_rate": int(req.get("heartRate", req.get("thalach", 72))),
-
-            "chol": int(req.get("chol", 200)),
-            "fbs": int(req.get("fbs", 0)),
-
-            "steps": int(req.get("steps", 5000)),
-            "sleep": float(req.get("sleep", 7))
+            "chol":         int(req.get("chol", 200)),
+            "fbs":          int(req.get("fbs", 0)),
+            "steps":        int(req.get("steps", 5000)),
+            "sleep":        float(req.get("sleep", 7))
         }
+
         print("DATA SENT TO RULE ENGINE:", data)
-        ml_risk = predict_risk(data)
+
+        ml_risk     = predict_risk(data)
         rule_result = rule_check(data)
-        final_risk = final_decision(ml_risk, rule_result)
+        final_risk  = final_decision(ml_risk, rule_result)
 
-        record = {
-            "user_id": data["user_id"],
-            "metrics": data,
-            "ml_result": ml_risk,
-            "rule_result": rule_result["risk"],
+        now = datetime.utcnow()
+
+        # ── MongoDB record (unchanged schema) ──────────────────────────────
+        mongo_record = {
+            "user_id":      data["user_id"],
+            "metrics":      data,
+            "ml_result":    ml_risk,
+            "rule_result":  rule_result["risk"],
             "final_result": final_risk,
-            "reason": rule_result["reason"],
-            "timestamp": datetime.utcnow()
+            "reason":       rule_result["reason"],
+            "timestamp":    now
         }
+        records_collection.insert_one(mongo_record)
 
-        records_collection.insert_one(record)
+        # ── JSON file record (flat, chart-friendly) ────────────────────────
+        json_record = {
+            "id":        str(uuid.uuid4())[:8],
+            "user_id":   data["user_id"],
+            "timestamp": now.isoformat(timespec="seconds"),
+            "inputs": {
+                "age":          data["age"],
+                "sex":          int(req.get("sex", 1)),
+                "systolic_bp":  data["systolic_bp"],
+                "diastolic_bp": data["diastolic_bp"],
+                "heart_rate":   data["heart_rate"],
+                "chol":         data["chol"],
+                "fbs":          data["fbs"],
+                "steps":        data["steps"],
+                "sleep":        data["sleep"]
+            },
+            "result": {
+                "mlRisk":    ml_risk,
+                "ruleRisk":  rule_result["risk"],
+                "finalRisk": final_risk,
+                "score":     _risk_to_score(final_risk),
+                "reason":    rule_result["reason"]
+            }
+        }
+        append_json_record(json_record)
 
         return jsonify({
-            "mlRisk": ml_risk,
-            "ruleRisk": rule_result["risk"],
+            "mlRisk":    ml_risk,
+            "ruleRisk":  rule_result["risk"],
             "finalRisk": final_risk,
-            "reason": rule_result["reason"]
+            "reason":    rule_result["reason"]
         })
 
     except Exception as e:
         print("ERROR:", str(e))
         return jsonify({"error": str(e)}), 400
+
+
+def _risk_to_score(risk_str):
+    """Convert final risk label to a numeric score for chart display."""
+    r = (risk_str or "").upper()
+    if "HIGH" in r:
+        return 8
+    if "MODERATE" in r:
+        return 4
+    return 1
 
 
 # ---------------- API: HISTORY ----------------
@@ -244,12 +316,39 @@ def history():
     if not is_logged_in():
         return jsonify({"error": "Unauthorized"}), 401
 
-    records = list(records_collection.find(
-        {"user_id": session["user_id"]},
-        {"_id": 0}
-    ).sort("timestamp", -1).limit(10))
+    # Serve from JSON file for consistent flat structure
+    user_records = get_user_json_records(session["user_id"], limit=10)
+    return jsonify(user_records)
 
-    return jsonify(records)
+
+# ---------------- API: RECORDS SUMMARY (Records dashboard charts) ------------
+
+@app.route("/api/records/summary")
+def records_summary():
+    if not is_logged_in():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_records = get_user_json_records(session["user_id"])
+
+    entries = []
+    for r in user_records:
+        inp = r.get("inputs", {})
+        res = r.get("result", {})
+        entries.append({
+            "id":          r.get("id"),
+            "timestamp":   r.get("timestamp"),
+            "risk":        res.get("finalRisk", ""),
+            "score":       res.get("score", 0),
+            "reason":      res.get("reason", ""),
+            "steps":       inp.get("steps", 0),
+            "sleep":       inp.get("sleep", 0),
+            "systolic_bp": inp.get("systolic_bp", 0),
+            "chol":        inp.get("chol", 0),
+            "heart_rate":  inp.get("heart_rate", 0),
+            "age":         inp.get("age", 0),
+        })
+
+    return jsonify({"count": len(entries), "entries": entries})
 
 
 # ---------------- API: DASHBOARD DATA ----------------
@@ -266,14 +365,14 @@ def dashboard_data():
 
     records.reverse()
 
-    heart = [r["metrics"].get("heart_rate", 72) for r in records if "metrics" in r]
-    sleep = [6 + (i % 3) for i in range(len(heart))]
+    heart  = [r["metrics"].get("heart_rate", 72) for r in records if "metrics" in r]
+    sleep  = [6 + (i % 3) for i in range(len(heart))]
     labels = ["Day " + str(i + 1) for i in range(len(heart))]
 
     return jsonify({
         "labels": labels,
-        "heart": heart,
-        "sleep": sleep
+        "heart":  heart,
+        "sleep":  sleep
     })
 
 

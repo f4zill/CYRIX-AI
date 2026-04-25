@@ -1,994 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CYRIX • Health Intelligence Dashboard</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #1a1208;
-      --panel: #211a0e;
-      --card: #2a2010;
-      --card-alt: #241c0c;
-      --amber: #e8a835;
-      --amber-soft: #e8a83522;
-      --amber-glow: #e8a83540;
-      --terracotta: #c8613a;
-      --terra-soft: #c8613a22;
-      --sage: #7a9e6e;
-      --sage-soft: #7a9e6e1a;
-      --cream: #f0e6cc;
-      --text: #ede4cf;
-      --muted: #a09070;
-      --border: rgba(232, 168, 53, 0.12);
-      --border-warm: rgba(232, 168, 53, 0.25);
-      --danger: #c85a3a;
-      --warn: #d4843a;
-    }
-
-    *,
-    *::before,
-    *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      display: flex;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      background-image:
-        radial-gradient(ellipse 80% 60% at 10% 0%, #2e1f0820 0%, transparent 60%),
-        radial-gradient(ellipse 60% 80% at 90% 100%, #1a100620 0%, transparent 60%);
-    }
-
-    /* ─── SIDEBAR ─────────────────────────────── */
-    aside {
-      width: 240px;
-      min-height: 100vh;
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      color: var(--amber);
-      text-align: center;
-      margin-bottom: 8px;
-    }
-
-    .logo-sub {
-      font-size: 9px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: 36px;
-    }
-
-    .nav-section-label {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 12px;
-      margin: 16px 0 8px;
-    }
-
-    nav ul {
-      list-style: none;
-    }
-
-    nav li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: 10px;
-      margin-bottom: 3px;
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 400;
-      transition: all 0.2s;
-      border: 1px solid transparent;
-    }
-
-    nav li:hover {
-      background: var(--amber-soft);
-      color: var(--amber);
-    }
-
-    nav li.active {
-      background: linear-gradient(135deg, var(--amber-soft), var(--terra-soft));
-      color: var(--cream);
-      border-color: var(--border-warm);
-    }
-
-    nav li.active .nav-icon {
-      color: var(--amber);
-    }
-
-    .nav-icon {
-      font-size: 15px;
-      width: 18px;
-      text-align: center;
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-    }
-
-    .user-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-    }
-
-    .avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--amber), var(--terracotta));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      color: #1a0e00;
-      flex-shrink: 0;
-    }
-
-    .user-info p {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--cream);
-    }
-
-    .user-info span {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .logout-btn {
-      width: 100%;
-      padding: 10px;
-      background: none;
-      border: 1px solid rgba(200, 97, 58, 0.3);
-      border-radius: 8px;
-      color: var(--terracotta);
-      font-size: 13px;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .logout-btn:hover {
-      background: var(--terra-soft);
-    }
-
-    /* ─── MAIN ────────────────────────────────── */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* ─── HEADER ──────────────────────────────── */
-    header {
-      padding: 18px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(33, 26, 14, 0.7);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .header-left h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--cream);
-    }
-
-    .header-left p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--sage);
-      box-shadow: 0 0 0 3px var(--sage-soft);
-      animation: pulse 2s infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 0 3px var(--sage-soft);
-      }
-
-      50% {
-        box-shadow: 0 0 0 6px transparent;
-      }
-    }
-
-    .badge {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--sage-soft);
-      color: var(--sage);
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid rgba(122, 158, 110, 0.25);
-      letter-spacing: 0.3px;
-    }
-
-    .date-badge {
-      font-size: 12px;
-      color: var(--muted);
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-    }
-
-    /* ─── CONTENT ─────────────────────────────── */
-    .content {
-      padding: 28px 32px;
-      flex: 1;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .section-header h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .view-all {
-      font-size: 12px;
-      color: var(--amber);
-      cursor: pointer;
-      opacity: 0.8;
-    }
-
-    /* ─── STAT CARDS GRID ─────────────────────── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 20px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.25s;
-      cursor: default;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--card-accent, var(--amber)), transparent);
-      opacity: 0.6;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--border-warm);
-      background: var(--card-alt);
-    }
-
-    .stat-card .label {
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    .stat-card .value {
-      font-family: 'Syne', sans-serif;
-      font-size: 36px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--cream);
-      margin-bottom: 8px;
-    }
-
-    .stat-card .value span {
-      font-size: 16px;
-      font-weight: 400;
-      margin-left: 2px;
-      color: var(--muted);
-    }
-
-    .stat-card .sub {
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .stat-card .trend-up {
-      color: var(--sage);
-    }
-
-    .stat-card .trend-warn {
-      color: var(--warn);
-    }
-
-    .stat-card .trend-ok {
-      color: var(--amber);
-    }
-
-    .stat-icon {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-
-    /* ─── MAIN GRID ────────────────────────────── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      transition: border-color 0.2s;
-    }
-
-    .panel:hover {
-      border-color: var(--border-warm);
-    }
-
-    .panel h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--cream);
-      margin-bottom: 6px;
-    }
-
-    .panel-subtitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    /* ─── CHART ────────────────────────────────── */
-    .chart-wrap {
-      position: relative;
-      height: 180px;
-    }
-
-    /* ─── INSIGHTS ─────────────────────────────── */
-    .insight-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 13px 14px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .insight-item:hover {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: var(--border);
-    }
-
-    .insight-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .dot-green {
-      background: var(--sage);
-      box-shadow: 0 0 6px var(--sage-soft);
-    }
-
-    .dot-amber {
-      background: var(--amber);
-      box-shadow: 0 0 6px var(--amber-soft);
-    }
-
-    .dot-warn {
-      background: var(--warn);
-    }
-
-    .insight-text {
-      font-size: 13.5px;
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    .insight-sub {
-      font-size: 11.5px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* ─── BOTTOM ROW ───────────────────────────── */
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* ─── VITALS LIST ───────────────────────────── */
-    .vital-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-    }
-
-    .vital-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .vital-label {
-      color: var(--muted);
-    }
-
-    .vital-val {
-      font-weight: 500;
-      color: var(--cream);
-    }
-
-    .vital-badge {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      letter-spacing: 0.5px;
-    }
-
-    .vb-good {
-      background: var(--sage-soft);
-      color: var(--sage);
-    }
-
-    .vb-warn {
-      background: rgba(212, 132, 58, 0.15);
-      color: var(--warn);
-    }
-
-    /* ─── MINI PROGRESS ─────────────────────────── */
-    .progress-item {
-      margin-bottom: 16px;
-    }
-
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-bottom: 7px;
-    }
-
-    .progress-label {
-      color: var(--muted);
-    }
-
-    .progress-val {
-      color: var(--cream);
-      font-weight: 500;
-    }
-
-    .progress-bar {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 1s ease;
-    }
-
-    /* ─── CTA BUTTON ────────────────────────────── */
-    .cta-btn {
-      width: 100%;
-      padding: 13px;
-      margin-top: 18px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
-      color: #1a0e00;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.3px;
-    }
-
-    .cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(232, 168, 53, 0.25);
-    }
-
-    .cta-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* ─── RESPONSIVE ─────────────────────────────── */
-    @media (max-width: 1100px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .bottom-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 800px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .bottom-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 600px) {
-      aside {
-        display: none;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .content {
-        padding: 20px 16px;
-      }
-    }
+      --bg:#1a1208; --panel:#211a0e; --card:#2a2010; --card-alt:#241c0c;
+      --amber:#e8a835; --amber-soft:#e8a83522; --amber-glow:#e8a83540;
+      --terracotta:#c8613a; --terra-soft:#c8613a22;
+      --sage:#7a9e6e; --sage-soft:#7a9e6e1a;
+      --cream:#f0e6cc; --text:#ede4cf; --muted:#a09070;
+      --border:rgba(232,168,53,0.12); --border-warm:rgba(232,168,53,0.25);
+      --danger:#c85a3a; --warn:#d4843a;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;background:var(--bg);color:var(--text);background-image:radial-gradient(ellipse 80% 60% at 10% 0%,#2e1f0820 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 90% 100%,#1a100620 0%,transparent 60%);}
+
+    /* ─── SIDEBAR ─── */
+    aside{width:240px;min-height:100vh;background:var(--panel);border-right:1px solid var(--border);padding:28px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+    .logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:4px;color:var(--amber);text-align:center;margin-bottom:8px;}
+    .logo-sub{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:36px;}
+    .nav-section-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 12px;margin:16px 0 8px;}
+    nav ul{list-style:none;}
+    nav li{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;margin-bottom:3px;cursor:pointer;color:var(--muted);font-size:14px;font-weight:400;transition:all .2s;border:1px solid transparent;}
+    nav li:hover{background:var(--amber-soft);color:var(--amber);}
+    nav li.active{background:linear-gradient(135deg,var(--amber-soft),var(--terra-soft));color:var(--cream);border-color:var(--border-warm);}
+    nav li.active .nav-icon{color:var(--amber);}
+    .nav-icon{font-size:15px;width:18px;text-align:center;}
+    .sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--border);}
+    .user-block{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:10px;}
+    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--terracotta));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#1a0e00;flex-shrink:0;}
+    .user-info p{font-size:13px;font-weight:500;color:var(--cream);}
+    .user-info span{font-size:11px;color:var(--muted);}
+    .logout-btn{width:100%;padding:10px;background:none;border:1px solid rgba(200,97,58,0.3);border-radius:8px;color:var(--terracotta);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .logout-btn:hover{background:var(--terra-soft);}
+
+    /* ─── MAIN ─── */
+    main{flex:1;display:flex;flex-direction:column;overflow-x:hidden;}
+    header{padding:18px 32px;display:flex;justify-content:space-between;align-items:center;background:rgba(33,26,14,0.7);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+    .header-left h1{font-family:'Syne',sans-serif;font-size:17px;font-weight:600;color:var(--cream);}
+    .header-left p{font-size:12px;color:var(--muted);margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:12px;}
+    .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--sage);box-shadow:0 0 0 3px var(--sage-soft);animation:pulse 2s infinite;flex-shrink:0;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--sage-soft);}50%{box-shadow:0 0 0 6px transparent;}}
+    .badge{display:flex;align-items:center;gap:7px;background:var(--sage-soft);color:var(--sage);padding:6px 14px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid rgba(122,158,110,.25);letter-spacing:.3px;}
+    .date-badge{font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;border:1px solid var(--border);}
+
+    /* ─── CONTENT ─── */
+    .content{padding:28px 32px;flex:1;}
+    .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+    .section-header h2{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+    .view-all{font-size:12px;color:var(--amber);cursor:pointer;opacity:.8;text-decoration:none;}
+    .view-all:hover{opacity:1;}
+
+    /* ─── STAT CARDS ─── */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 20px;position:relative;overflow:hidden;transition:all .25s;cursor:default;}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--card-accent,var(--amber)),transparent);opacity:.6;}
+    .stat-card:hover{transform:translateY(-4px);border-color:var(--border-warm);background:var(--card-alt);}
+    .stat-card .label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+    .stat-card .value{font-family:'Syne',sans-serif;font-size:36px;font-weight:700;line-height:1;color:var(--cream);margin-bottom:8px;}
+    .stat-card .value span{font-size:16px;font-weight:400;margin-left:2px;color:var(--muted);}
+    .stat-card .sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+    .trend-up{color:var(--sage);}
+    .trend-warn{color:var(--warn);}
+    .trend-ok{color:var(--amber);}
+    .trend-bad{color:var(--terracotta);}
+    .stat-icon{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+    /* ─── MAIN GRID ─── */
+    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .2s;}
+    .panel:hover{border-color:var(--border-warm);}
+    .panel h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--cream);margin-bottom:6px;}
+    .panel-subtitle{font-size:12px;color:var(--muted);margin-bottom:20px;}
+    .chart-wrap{position:relative;height:180px;}
+
+    /* ─── INSIGHTS ─── */
+    .insight-item{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:10px;margin-bottom:10px;border:1px solid transparent;transition:all .2s;}
+    .insight-item:hover{background:rgba(255,255,255,.02);border-color:var(--border);}
+    .insight-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+    .dot-green{background:var(--sage);box-shadow:0 0 6px var(--sage-soft);}
+    .dot-amber{background:var(--amber);box-shadow:0 0 6px var(--amber-soft);}
+    .dot-warn{background:var(--warn);}
+    .dot-red{background:var(--terracotta);}
+    .insight-text{font-size:13.5px;color:var(--text);line-height:1.5;}
+    .insight-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+    /* ─── BOTTOM GRID ─── */
+    .bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+    .vital-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+    .vital-row:last-child{border-bottom:none;padding-bottom:0;}
+    .vital-label{color:var(--muted);}
+    .vital-val{font-weight:500;color:var(--cream);}
+    .vital-badge{font-size:10px;padding:2px 8px;border-radius:999px;letter-spacing:.5px;}
+    .vb-good{background:var(--sage-soft);color:var(--sage);}
+    .vb-warn{background:rgba(212,132,58,.15);color:var(--warn);}
+    .vb-bad{background:var(--terra-soft);color:var(--terracotta);}
+
+    /* ─── PROGRESS ─── */
+    .progress-item{margin-bottom:16px;}
+    .progress-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;}
+    .progress-label{color:var(--muted);}
+    .progress-val{color:var(--cream);font-weight:500;}
+    .progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;}
+    .progress-fill{height:100%;border-radius:999px;transition:width 1.2s ease;}
+
+    /* ─── CTA ─── */
+    .cta-btn{width:100%;padding:13px;margin-top:18px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--amber) 0%,var(--terracotta) 100%);color:#1a0e00;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+    .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,168,53,.25);}
+
+    /* ─── EMPTY STATE ─── */
+    .no-data{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:13px;gap:8px;opacity:.65;}
+    .no-data .nd-icon{font-size:28px;opacity:.4;}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.bottom-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:800px){.main-grid{grid-template-columns:1fr;}.bottom-grid{grid-template-columns:1fr;}}
+    @media(max-width:600px){aside{display:none;}.stats-grid{grid-template-columns:repeat(2,1fr);}.content{padding:20px 16px;}}
   </style>
 </head>
-
 <body>
 
-  <!-- ═══ SIDEBAR ═══ -->
-  <aside>
-    <div class="logo">CYRIX</div>
-    <div class="logo-sub">Health Intelligence</div>
+<!-- ═══ SIDEBAR ═══ -->
+<aside>
+  <div class="logo">CYRIX</div>
+  <div class="logo-sub">Health Intelligence</div>
 
-    <div class="nav-section-label">Main</div>
-    <nav>
-      <ul>
-        <li class="active" onclick="go('/dashboard')">
-          <span class="nav-icon">⬡</span> Dashboard
-        </li>
+  <div class="nav-section-label">Main</div>
+  <nav><ul>
+    <li class="active" onclick="location.href='/dashboard'"><span class="nav-icon">⬡</span> Dashboard</li>
+    <li onclick="location.href='/profile'"><span class="nav-icon">◎</span> Profile</li>
+    <li onclick="location.href='/plans'"><span class="nav-icon">▦</span> Plans</li>
+    <li onclick="location.href='/records'"><span class="nav-icon">◈</span> Records</li>
+  </ul></nav>
 
-        <li onclick="go('/profile')">
-          <span class="nav-icon">◎</span> Profile
-        </li>
+  <div class="nav-section-label">Tools</div>
+  <nav><ul>
+    <li onclick="location.href='/session'"><span class="nav-icon">◇</span> Assessment</li>
+    <li onclick="location.href='/rules'"><span class="nav-icon">◉</span> Insights</li>
+    <li onclick="location.href='/nutrition'"><span class="nav-icon">◐</span> Nutrition</li>
+  </ul></nav>
 
-        <li onclick="go('/results')">
-          <span class="nav-icon">▦</span> Reports
-        </li>
-
-        <li onclick="go('/records')">
-          <span class="nav-icon">◈</span> Records
-        </li>
-      </ul>
-    </nav>
-
-    <div class="nav-section-label">Tools</div>
-    <nav>
-      <ul>
-        <li onclick="go('/session')">
-          <span class="nav-icon">◇</span> Assessment
-        </li>
-
-        <li onclick="go('/rules')">
-          <span class="nav-icon">◉</span> Insights
-        </li>
-
-        <li onclick="go('/nutrition')">
-          <span class="nav-icon">◐</span> Nutrition
-        </li>
-      </ul>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-block">
-        <div class="avatar">{{ user_name[0] | upper }}</div>
+  <div class="sidebar-footer">
+    <div class="user-block">
+      <div class="avatar">{{ user_name[0] | upper }}</div>
+      <div class="user-info">
+        <p>{{ user_name }}</p>
+        <span>Member</span>
       </div>
-      <button class="logout-btn" onclick="go('/logout')">
-        Sign out
-      </button>
     </div>
-  </aside>
+    <button class="logout-btn" onclick="location.href='/logout'">Sign out</button>
+  </div>
+</aside>
 
-  <!-- ═══ MAIN ═══ -->
-  <main>
+<!-- ═══ MAIN ═══ -->
+<main>
+  <header>
+    <div class="header-left">
+      <h1>Health Dashboard</h1>
+      <p id="headerDate">—</p>
+    </div>
+    <div class="header-right">
+      <span class="date-badge" id="weekBadge">—</span>
+      <div class="badge"><span class="pulse-dot"></span> Live Monitoring</div>
+    </div>
+  </header>
 
-    <header>
-      <div class="header-left">
-        <h1>Health Dashboard</h1>
-        <p>Friday, 25 April 2026 · Weekly overview</p>
-      </div>
-      <div class="header-right">
-        <span class="date-badge">Q2 · Week 17</span>
-        <div class="badge">
-          <span class="pulse-dot"></span>
-          Live Monitoring
+  <div class="content">
+
+    <!-- ── STAT CARDS ── -->
+    <div class="section-header">
+      <h2>Overview</h2>
+      <a class="view-all" href="/records">View all records →</a>
+    </div>
+
+    <div class="stats-grid">
+
+      <!-- Health Score: from Flask stats (updated per latest record) -->
+      <div class="stat-card" style="--card-accent:#e8a835;">
+        <div class="stat-icon" style="background:rgba(232,168,53,.12);color:var(--amber);">◎</div>
+        <div class="label">Health Score</div>
+        <div class="value" id="sc-score">{{ stats.health_score }}<span>%</span></div>
+        <div class="sub" id="sc-score-sub">
+          {% if stats.health_score >= 70 %}
+            <span class="trend-up">▲ Good standing</span>
+          {% elif stats.health_score >= 50 %}
+            <span class="trend-warn">● Moderate risk</span>
+          {% else %}
+            <span class="trend-bad">▼ Needs attention</span>
+          {% endif %}
         </div>
       </div>
-    </header>
 
-    <div class="content">
-
-      <!-- STAT CARDS -->
-      <div class="section-header">
-        <h2>Overview</h2>
-        <span class="view-all">View all metrics →</span>
+      <!-- Heart Rate: from Flask stats -->
+      <div class="stat-card" style="--card-accent:#c8613a;">
+        <div class="stat-icon" style="background:rgba(200,97,58,.12);color:var(--terracotta);">♡</div>
+        <div class="label">Heart Rate</div>
+        <div class="value" id="sc-hr">{{ stats.heart_rate }}<span>bpm</span></div>
+        <div class="sub" id="sc-hr-sub">
+          {% set hr = stats.heart_rate | int %}
+          {% if hr >= 60 and hr <= 100 %}
+            <span class="trend-up">● Normal range</span>
+          {% elif hr < 60 %}
+            <span class="trend-warn">▼ Below normal</span>
+          {% else %}
+            <span class="trend-bad">▲ Elevated</span>
+          {% endif %}
+        </div>
       </div>
 
-      <div class="stats-grid">
-
-        <div class="stat-card" style="--card-accent: #e8a835;">
-          <div class="stat-icon" style="background:rgba(232,168,53,0.12); color:var(--amber);">◎</div>
-          <div class="label">Health Score</div>
-          <div class="value">82<span>%</span></div>
-          <div class="sub trend-ok">▲ 3% from last week</div>
+      <!-- Blood Pressure: from Flask stats -->
+      <div class="stat-card" style="--card-accent:#d4843a;">
+        <div class="stat-icon" style="background:rgba(212,132,58,.12);color:var(--warn);">↑↓</div>
+        <div class="label">Blood Pressure</div>
+        <div class="value" id="sc-bp" style="font-size:28px;">{{ stats.bp }}<span>mmHg</span></div>
+        <div class="sub" id="sc-bp-sub">
+          {% set sys = stats.bp.split('/')[0] | int %}
+          {% if sys < 120 %}
+            <span class="trend-up">● Optimal</span>
+          {% elif sys < 130 %}
+            <span class="trend-ok">● Normal</span>
+          {% elif sys < 140 %}
+            <span class="trend-warn">⚠ Elevated</span>
+          {% else %}
+            <span class="trend-bad">▲ High — monitor closely</span>
+          {% endif %}
         </div>
-
-        <div class="stat-card" style="--card-accent: #c8613a;">
-          <div class="stat-icon" style="background:rgba(200,97,58,0.12); color:var(--terracotta);">♡</div>
-          <div class="label">Heart Rate</div>
-          <div class="value">72<span>bpm</span></div>
-          <div class="sub trend-up">● Normal range</div>
-        </div>
-
-        <div class="stat-card" style="--card-accent: #d4843a;">
-          <div class="stat-icon" style="background:rgba(212,132,58,0.12); color:var(--warn);">↑↓</div>
-          <div class="label">Blood Pressure</div>
-          <div class="value">120<span>/80</span></div>
-          <div class="sub trend-warn">⚠ Slight variation</div>
-        </div>
-
-        <div class="stat-card" style="--card-accent: #7a9e6e;">
-          <div class="stat-icon" style="background:rgba(122,158,110,0.12); color:var(--sage);">◑</div>
-          <div class="label">Sleep</div>
-          <div class="value">7.5<span>hrs</span></div>
-          <div class="sub trend-up">▲ +30 min improved</div>
-        </div>
-
       </div>
 
-      <!-- MAIN CHARTS GRID -->
-      <div class="main-grid">
-
-        <!-- Heart Rate Chart -->
-        <div class="panel">
-          <h3>Weekly Heart Rate</h3>
-          <div class="panel-subtitle">Last 7 days · avg 72 bpm</div>
-          <div class="chart-wrap">
-            <canvas id="heartChart"></canvas>
-          </div>
+      <!-- Sleep: loaded dynamically from /api/records/summary -->
+      <div class="stat-card" style="--card-accent:#7a9e6e;">
+        <div class="stat-icon" style="background:rgba(122,158,110,.12);color:var(--sage);">◐</div>
+        <div class="label">Sleep</div>
+        <div class="value" id="sc-sleep">{{ stats.sleep }}<span>hrs</span></div>
+        <div class="sub" id="sc-sleep-sub">
+          {% set sl = stats.sleep | float %}
+          {% if sl >= 7 and sl <= 9 %}
+            <span class="trend-up">▲ Optimal range</span>
+          {% elif sl >= 6 %}
+            <span class="trend-warn">● Acceptable</span>
+          {% else %}
+            <span class="trend-bad">▼ Below target</span>
+          {% endif %}
         </div>
-
-        <!-- Insights -->
-        <div class="panel">
-          <h3>Health Insights</h3>
-          <div class="panel-subtitle">Personalized recommendations</div>
-
-          <div class="insight-item">
-            <span class="insight-dot dot-green"></span>
-            <div>
-              <div class="insight-text">Heart rate is stable and within optimal range</div>
-              <div class="insight-sub">Consistent across all 7 days · No anomalies detected</div>
-            </div>
-          </div>
-
-          <div class="insight-item">
-            <span class="insight-dot dot-green"></span>
-            <div>
-              <div class="insight-text">Sleep quality improved by 12% this week</div>
-              <div class="insight-sub">Deep sleep cycles increased · Recommend maintaining schedule</div>
-            </div>
-          </div>
-
-          <div class="insight-item">
-            <span class="insight-dot dot-warn"></span>
-            <div>
-              <div class="insight-text">Minor blood pressure variation on Wednesday</div>
-              <div class="insight-sub">Possibly stress-related · Monitor for next 48 hrs</div>
-            </div>
-          </div>
-
-          <div class="insight-item">
-            <span class="insight-dot dot-amber"></span>
-            <div>
-              <div class="insight-text">Hydration tracking below weekly target</div>
-              <div class="insight-sub">Aim for 2.5L daily · Currently averaging 1.8L</div>
-            </div>
-          </div>
-
-          <button class="cta-btn">Start New Assessment</button>
-        </div>
-
       </div>
 
-      <!-- BOTTOM ROW -->
-      <div class="section-header" style="margin-top: 8px;">
-        <h2>Vitals & Goals</h2>
+    </div><!-- /stats-grid -->
+
+    <!-- ── MAIN GRID ── -->
+    <div class="main-grid">
+
+      <!-- Heart Rate + Risk Score Chart (from /api/dashboard-data) -->
+      <div class="panel">
+        <h3 id="chartTitle">Weekly Heart Rate</h3>
+        <div class="panel-subtitle" id="chartSubtitle">Loading from your records…</div>
+        <div class="chart-wrap" id="heartChartWrap">
+          <div class="no-data"><span class="nd-icon">♡</span>Loading…</div>
+        </div>
       </div>
 
-      <div class="bottom-grid">
-
-        <!-- Vitals -->
-        <div class="panel">
-          <h3>Vital Signs</h3>
-          <div class="panel-subtitle">Current readings</div>
-          <div class="vital-row">
-            <span class="vital-label">Oxygen Saturation</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="vital-val">98%</span>
-              <span class="vital-badge vb-good">Normal</span>
-            </div>
-          </div>
-          <div class="vital-row">
-            <span class="vital-label">Body Temperature</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="vital-val">36.8°C</span>
-              <span class="vital-badge vb-good">Normal</span>
-            </div>
-          </div>
-          <div class="vital-row">
-            <span class="vital-label">Respiratory Rate</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="vital-val">16 rpm</span>
-              <span class="vital-badge vb-good">Optimal</span>
-            </div>
-          </div>
-          <div class="vital-row">
-            <span class="vital-label">Glucose Level</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="vital-val">94 mg/dL</span>
-              <span class="vital-badge vb-warn">Monitor</span>
-            </div>
-          </div>
+      <!-- Insights (from /api/records/summary latest entry) -->
+      <div class="panel">
+        <h3>Health Insights</h3>
+        <div class="panel-subtitle">Generated from your latest assessment</div>
+        <div id="insightsList">
+          <div class="no-data" style="height:140px"><span class="nd-icon">◉</span>Loading insights…</div>
         </div>
-
-        <!-- Weekly Goals -->
-        <div class="panel">
-          <h3>Weekly Goals</h3>
-          <div class="panel-subtitle">Progress this week</div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-label">Steps Daily Avg</span>
-              <span class="progress-val">8,400 / 10,000</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill"
-                style="width:84%; background: linear-gradient(90deg, var(--amber), var(--terracotta));"></div>
-            </div>
-          </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-label">Sleep Goal</span>
-              <span class="progress-val">7.5 / 8 hrs</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:94%; background: linear-gradient(90deg, var(--sage), #5c8a50);">
-              </div>
-            </div>
-          </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-label">Active Minutes</span>
-              <span class="progress-val">38 / 45 min</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:84%; background: linear-gradient(90deg, #c8a035, var(--amber));">
-              </div>
-            </div>
-          </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-label">Hydration</span>
-              <span class="progress-val">1.8 / 2.5 L</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:72%; background: linear-gradient(90deg, #6e8db4, #8aabcc);"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sleep Chart -->
-        <div class="panel">
-          <h3>Sleep Quality</h3>
-          <div class="panel-subtitle">Hours per night · this week</div>
-          <div class="chart-wrap">
-            <canvas id="sleepChart"></canvas>
-          </div>
-        </div>
-
+        <button class="cta-btn" onclick="location.href='/session'">Start New Assessment</button>
       </div>
 
-    </div><!-- /content -->
-  </main>
+    </div><!-- /main-grid -->
 
-  <script>
-    const chartDefaults = {
-      plugins: {
-        legend: { display: false }, tooltip: {
-          backgroundColor: '#2a2010',
-          borderColor: 'rgba(232,168,53,0.3)',
-          borderWidth: 1,
-          titleColor: '#ede4cf',
-          bodyColor: '#a09070',
-          padding: 10,
-          cornerRadius: 8
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-          ticks: { color: '#a09070', font: { size: 11 } }
-        },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-          ticks: { color: '#a09070', font: { size: 11 } },
-          border: { display: false }
-        }
-      }
-    };
+    <!-- ── BOTTOM ROW ── -->
+    <div class="section-header" style="margin-top:8px;">
+      <h2>Vitals &amp; Goals</h2>
+    </div>
 
-    // Heart Rate
-    const heartCtx = document.getElementById('heartChart').getContext('2d');
-    const heartGrad = heartCtx.createLinearGradient(0, 0, 0, 180);
-    heartGrad.addColorStop(0, 'rgba(232,168,53,0.3)');
-    heartGrad.addColorStop(1, 'rgba(232,168,53,0.01)');
+    <div class="bottom-grid">
 
-    new Chart(heartCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          data: [72, 75, 70, 80, 73, 71, 72],
-          borderColor: '#e8a835',
-          borderWidth: 2.5,
-          backgroundColor: heartGrad,
-          tension: 0.45,
-          fill: true,
-          pointBackgroundColor: '#e8a835',
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: { ...chartDefaults, maintainAspectRatio: false }
-    });
+      <!-- Vitals: from latest /api/records/summary entry -->
+      <div class="panel">
+        <h3>Vital Signs</h3>
+        <div class="panel-subtitle">From your latest record</div>
+        <div id="vitalsList">
+          <div class="no-data" style="height:140px"><span class="nd-icon">◎</span>Loading…</div>
+        </div>
+      </div>
 
-    // Sleep
-    const sleepCtx = document.getElementById('sleepChart').getContext('2d');
-    const sleepGrad = sleepCtx.createLinearGradient(0, 0, 0, 180);
-    sleepGrad.addColorStop(0, 'rgba(122,158,110,0.4)');
-    sleepGrad.addColorStop(1, 'rgba(122,158,110,0.01)');
+      <!-- Goals: averaged from last 7 days of records -->
+      <div class="panel">
+        <h3>Weekly Goals</h3>
+        <div class="panel-subtitle" id="goalsSubtitle">Progress this week</div>
+        <div id="goalsList">
+          <div class="no-data" style="height:140px"><span class="nd-icon">▦</span>Loading…</div>
+        </div>
+      </div>
 
-    new Chart(sleepCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          data: [6.5, 7, 6, 8, 7.5, 8.5, 7.5],
-          backgroundColor: (ctx) => {
-            const v = ctx.parsed?.y;
-            if (!v) return sleepGrad;
-            return v >= 7.5 ? 'rgba(122,158,110,0.7)' : 'rgba(122,158,110,0.35)';
-          },
-          borderColor: 'rgba(122,158,110,0.8)',
-          borderWidth: 1,
-          borderRadius: 6,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        ...chartDefaults,
-        maintainAspectRatio: false,
-        scales: {
-          ...chartDefaults.scales,
-          y: { ...chartDefaults.scales.y, min: 4, max: 10 }
-        }
-      }
-    });
-    function go(path) {
-      window.location.href = path;
+      <!-- Sleep Chart: from /api/records/summary -->
+      <div class="panel">
+        <h3>Sleep Quality</h3>
+        <div class="panel-subtitle" id="sleepSubtitle">Hours per assessment</div>
+        <div class="chart-wrap" id="sleepChartWrap">
+          <div class="no-data"><span class="nd-icon">◐</span>Loading…</div>
+        </div>
+      </div>
+
+    </div><!-- /bottom-grid -->
+
+  </div><!-- /content -->
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CYRIX Dashboard — dynamic layer
+//  Flask already injected: stats.health_score, stats.heart_rate,
+//  stats.bp, stats.sleep, user_name  (via Jinja2 above)
+//
+//  This JS layer fetches:
+//    /api/dashboard-data  → { labels, heart, sleep }
+//    /api/records/summary → { entries: [...] }
+//  and fills charts, insights, vitals, goals.
+// ═══════════════════════════════════════════════════════════════
+
+// ── Utilities ───────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const CD = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{display:false}, tooltip:{
+    backgroundColor:'#2a2010', titleColor:'#f0e6cc', bodyColor:'#a09070',
+    borderColor:'rgba(232,168,53,0.25)', borderWidth:1, padding:10, cornerRadius:8
+  }},
+  scales:{
+    x:{ grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}, ticks:{color:'#a09070',font:{size:10},maxRotation:0} },
+    y:{ grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}, ticks:{color:'#a09070',font:{size:10}}, border:{display:false} }
+  }
+};
+function cloneCD(extra={}){ return Object.assign(JSON.parse(JSON.stringify(CD)), extra); }
+
+let _charts = {};
+function mkChart(id, cfg){
+  if(_charts[id]) _charts[id].destroy();
+  _charts[id] = new Chart($(id), cfg);
+  return _charts[id];
+}
+
+function riskClass(r=''){
+  const v = r.toLowerCase();
+  if(v.includes('low'))  return 'low';
+  if(v.includes('high')) return 'high';
+  return 'medium';
+}
+
+function bpBadge(sys){
+  if(!sys)       return {label:'No data', cls:'vb-warn'};
+  if(sys < 120)  return {label:'Optimal',  cls:'vb-good'};
+  if(sys < 130)  return {label:'Normal',   cls:'vb-good'};
+  if(sys < 140)  return {label:'Elevated', cls:'vb-warn'};
+  return              {label:'High',     cls:'vb-bad'};
+}
+function cholBadge(c){
+  if(!c)      return {label:'No data',    cls:'vb-warn'};
+  if(c < 200) return {label:'Optimal',   cls:'vb-good'};
+  if(c < 240) return {label:'Borderline',cls:'vb-warn'};
+  return           {label:'High',       cls:'vb-bad'};
+}
+function sleepBadge(s){
+  if(!s)               return {label:'No data',   cls:'vb-warn'};
+  if(s >= 7 && s <= 9) return {label:'Optimal',   cls:'vb-good'};
+  if(s >= 6)           return {label:'Acceptable', cls:'vb-warn'};
+  return                     {label:'Low',        cls:'vb-bad'};
+}
+
+function numAvg(arr, key){
+  const v = arr.map(r=>parseFloat(r[key])).filter(x=>!isNaN(x)&&x>0);
+  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+}
+
+function weekOf(d){
+  const jan1 = new Date(d.getFullYear(),0,1);
+  const wk   = Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+  return `Q${Math.ceil((d.getMonth()+1)/3)} · Week ${wk}`;
+}
+
+// ── Date header ─────────────────────────────────────────────────
+(function(){
+  const now = new Date();
+  $('headerDate').textContent =
+    now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
+    ' · Weekly overview';
+  $('weekBadge').textContent = weekOf(now);
+})();
+
+// ── /api/dashboard-data → Heart Rate line chart ─────────────────
+async function loadHeartChart(){
+  try {
+    const res  = await fetch('/api/dashboard-data');
+    const data = await res.json();
+
+    if(!data.labels || !data.heart || !data.heart.length){
+      $('heartChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">♡</span>No heart rate data yet</div>';
+      return;
     }
-  </script>
 
+    $('chartTitle').textContent    = 'Weekly Heart Rate';
+    $('chartSubtitle').textContent = `Last ${data.labels.length} days · avg ${Math.round(data.heart.reduce((a,b)=>a+b,0)/data.heart.length)} bpm`;
+
+    $('heartChartWrap').innerHTML = '<canvas id="heartChart"></canvas>';
+    const ctx  = $('heartChart').getContext('2d');
+    const grad = ctx.createLinearGradient(0,0,0,180);
+    grad.addColorStop(0,'rgba(232,168,53,0.3)');
+    grad.addColorStop(1,'rgba(232,168,53,0.01)');
+
+    mkChart('heartChart',{
+      type:'line',
+      data:{
+        labels: data.labels,
+        datasets:[{
+          data: data.heart,
+          borderColor:'#e8a835', borderWidth:2.5,
+          backgroundColor: grad,
+          tension:0.45, fill:true,
+          pointBackgroundColor:'#e8a835',
+          pointRadius:4, pointHoverRadius:6
+        }]
+      },
+      options: cloneCD({ maintainAspectRatio:false })
+    });
+
+  } catch(e){
+    $('heartChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">♡</span>Could not load heart rate data</div>';
+  }
+}
+
+// ── /api/records/summary → everything else ──────────────────────
+async function loadSummary(){
+  try {
+    const res  = await fetch('/api/records/summary');
+    const data = await res.json();
+    const entries = (data.entries || []).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+
+    if(!entries.length){
+      ['insightsList','vitalsList','goalsList'].forEach(id=>{
+        $(id).innerHTML = '<div class="no-data" style="height:140px"><span class="nd-icon">◈</span>No records yet — run your first assessment</div>';
+      });
+      $('sleepChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">◐</span>No sleep data yet</div>';
+      return;
+    }
+
+    const latest = entries[0];
+    const prev   = entries[1] || null;
+
+    // ── Insights ────────────────────────────────────────────────
+    buildInsights(latest, prev, entries);
+
+    // ── Vitals ──────────────────────────────────────────────────
+    buildVitals(latest);
+
+    // ── Goals ───────────────────────────────────────────────────
+    buildGoals(entries);
+
+    // ── Sleep chart ─────────────────────────────────────────────
+    buildSleepChart(entries);
+
+    // ── Update sleep stat card with real latest value ────────────
+    if(latest.sleep && parseFloat(latest.sleep) > 0){
+      const sl   = parseFloat(latest.sleep);
+      const slSt = sleepBadge(sl);
+      $('sc-sleep').innerHTML = `${sl.toFixed(1)}<span>hrs</span>`;
+      $('sc-sleep-sub').innerHTML = `<span class="${slSt.cls==='vb-good'?'trend-up':slSt.cls==='vb-warn'?'trend-warn':'trend-bad'}">● ${slSt.label}</span>`;
+    }
+
+  } catch(e){
+    console.error('Summary load failed:', e);
+  }
+}
+
+// ── Insights builder ────────────────────────────────────────────
+function buildInsights(latest, prev, all){
+  const ins = [];
+  const rc  = riskClass(latest.risk||'');
+
+  // Overall risk
+  if(rc==='low'){
+    ins.push({dot:'dot-green', text:'Overall cardiovascular risk is LOW',
+      sub:'Latest assessment shows a healthy profile · Keep it up'});
+  } else if(rc==='high'){
+    ins.push({dot:'dot-red', text:'Cardiovascular risk is flagged as HIGH',
+      sub:'Consult a physician · Lifestyle changes recommended'});
+  } else {
+    ins.push({dot:'dot-warn', text:'Moderate cardiovascular risk detected',
+      sub:'Monitor closely · Consider a lifestyle review'});
+  }
+
+  // BP
+  const bp = parseFloat(latest.systolic_bp);
+  if(!isNaN(bp)){
+    if(bp < 120)      ins.push({dot:'dot-green', text:'Blood pressure is in the optimal range', sub:`${Math.round(bp)} mmHg · No intervention needed`});
+    else if(bp < 130) ins.push({dot:'dot-amber', text:'Blood pressure is normal but watch it',  sub:`${Math.round(bp)} mmHg · Stay active, reduce sodium`});
+    else              ins.push({dot:'dot-warn',  text:'Elevated blood pressure detected',        sub:`${Math.round(bp)} mmHg · Consider a lifestyle review`});
+  }
+
+  // Sleep
+  const sl = parseFloat(latest.sleep);
+  if(!isNaN(sl)){
+    if(sl >= 7 && sl <= 9)
+      ins.push({dot:'dot-green', text:`Sleep at ${sl.toFixed(1)}h is within optimal range`, sub:'7–9 hours recommended · Maintain your schedule'});
+    else
+      ins.push({dot:'dot-warn',  text:`Sleep of ${sl.toFixed(1)}h is below target`, sub:'Aim for 7–9 hours · Consistency is key'});
+  }
+
+  // Steps
+  const st = parseFloat(latest.steps);
+  if(!isNaN(st)){
+    if(st >= 10000)
+      ins.push({dot:'dot-green', text:`${Math.round(st).toLocaleString()} steps — daily goal achieved!`, sub:'Great physical activity level'});
+    else
+      ins.push({dot:'dot-amber', text:`${Math.round(st).toLocaleString()} steps — below 10,000 target`, sub:`${(10000-Math.round(st)).toLocaleString()} more steps to reach goal`});
+  }
+
+  // Reasons from rule engine
+  if(latest.reason){
+    latest.reason.split(';').map(r=>r.trim()).filter(Boolean).slice(0,2)
+      .forEach(r => ins.push({dot:'dot-warn', text:r, sub:'Flagged by your assessment'}));
+  }
+
+  $('insightsList').innerHTML = ins.slice(0,5).map(i=>`
+    <div class="insight-item">
+      <span class="insight-dot ${i.dot}"></span>
+      <div>
+        <div class="insight-text">${i.text}</div>
+        <div class="insight-sub">${i.sub}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Vitals builder ──────────────────────────────────────────────
+function buildVitals(r){
+  const bp   = parseFloat(r.systolic_bp);
+  const chol = parseFloat(r.chol);
+  const sl   = parseFloat(r.sleep);
+  const st   = parseFloat(r.steps);
+  const hr   = parseFloat(r.heart_rate);
+  const age  = parseFloat(r.age);
+
+  const rows = [
+    { label:'Blood Pressure', value: !isNaN(bp)   ? `${Math.round(bp)} mmHg`          : '—', ...bpBadge(!isNaN(bp)?bp:null) },
+    { label:'Cholesterol',    value: !isNaN(chol)  ? `${Math.round(chol)} mg/dL`       : '—', ...cholBadge(!isNaN(chol)?chol:null) },
+    { label:'Heart Rate',     value: !isNaN(hr)    ? `${Math.round(hr)} bpm`           : '—',
+      label2:'badge',
+      badge: !isNaN(hr) ? (hr>=60&&hr<=100?'Normal':hr<60?'Low':'High') : 'No data',
+      cls:   !isNaN(hr) ? (hr>=60&&hr<=100?'vb-good':'vb-warn') : 'vb-warn' },
+    { label:'Sleep',          value: !isNaN(sl)    ? `${sl.toFixed(1)} hrs`            : '—', ...sleepBadge(!isNaN(sl)?sl:null) },
+    { label:'Daily Steps',    value: !isNaN(st)    ? Math.round(st).toLocaleString()   : '—',
+      badge: !isNaN(st) ? (st>=10000?'Goal Met':'Below Target') : 'No data',
+      cls:   !isNaN(st) ? (st>=10000?'vb-good':'vb-warn') : 'vb-warn' },
+    { label:'Risk Level',     value: r.risk || '—',
+      badge: r.risk ? riskClass(r.risk).charAt(0).toUpperCase()+riskClass(r.risk).slice(1) : 'No data',
+      cls:   r.risk ? (riskClass(r.risk)==='low'?'vb-good':riskClass(r.risk)==='high'?'vb-bad':'vb-warn') : 'vb-warn' }
+  ];
+
+  $('vitalsList').innerHTML = rows.map(v=>`
+    <div class="vital-row">
+      <span class="vital-label">${v.label}</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="vital-val">${v.value}</span>
+        <span class="vital-badge ${v.cls}">${v.badge||v.label}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── Goals builder ───────────────────────────────────────────────
+function buildGoals(entries){
+  const cutoff  = Date.now() - 7*24*3600*1000;
+  const weekRec = entries.filter(r=>new Date(r.timestamp).getTime()>cutoff);
+  const use     = weekRec.length ? weekRec : entries.slice(0,5);
+  $('goalsSubtitle').textContent = `Based on ${use.length} record${use.length!==1?'s':''} this period`;
+
+  const avgSteps = numAvg(use,'steps');
+  const avgSleep = numAvg(use,'sleep');
+  const avgBP    = numAvg(use,'systolic_bp');
+  const avgChol  = numAvg(use,'chol');
+
+  const GOALS = [
+    { label:'Steps Daily Avg', val:avgSteps, target:10000,
+      fmt:v=>Math.round(v).toLocaleString(), unit:'',
+      pct: avgSteps ? Math.min(100,avgSteps/10000*100) : 0,
+      color:'linear-gradient(90deg,var(--amber),var(--terracotta))' },
+    { label:'Sleep Goal', val:avgSleep, target:8,
+      fmt:v=>v.toFixed(1), unit:'h',
+      pct: avgSleep ? Math.min(100,avgSleep/8*100) : 0,
+      color:'linear-gradient(90deg,var(--sage),#5c8a50)' },
+    { label:'BP Target', val:avgBP, target:120,
+      fmt:v=>Math.round(v), unit:'',
+      pct: avgBP ? Math.min(100, Math.max(0, (140-avgBP)/20*100)) : 0,
+      color:'linear-gradient(90deg,#c8a035,var(--amber))' },
+    { label:'Cholesterol', val:avgChol, target:200,
+      fmt:v=>Math.round(v), unit:'mg/dL',
+      pct: avgChol ? Math.min(100, Math.max(0, (240-avgChol)/40*100)) : 0,
+      color:'linear-gradient(90deg,#6e8db4,#8aabcc)' }
+  ];
+
+  $('goalsList').innerHTML = GOALS.map(g=>`
+    <div class="progress-item">
+      <div class="progress-header">
+        <span class="progress-label">${g.label}</span>
+        <span class="progress-val">${g.val!=null ? g.fmt(g.val)+g.unit : '—'} / ${g.fmt(g.target)}${g.unit}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${g.pct.toFixed(1)}%;background:${g.color}"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Sleep chart builder ─────────────────────────────────────────
+function buildSleepChart(entries){
+  const rev    = [...entries].reverse();
+  const labels = rev.map((r,i)=>{
+    const d = new Date(r.timestamp);
+    return isNaN(d) ? `#${i+1}` : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+  });
+  const sleepData = rev.map(r=>parseFloat(r.sleep)||0);
+
+  $('sleepSubtitle').textContent = `${entries.length} assessment${entries.length!==1?'s':''}`;
+  $('sleepChartWrap').innerHTML  = '<canvas id="sleepChart"></canvas>';
+
+  const ctx  = $('sleepChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,'rgba(122,158,110,0.4)');
+  grad.addColorStop(1,'rgba(122,158,110,0.01)');
+
+  mkChart('sleepChart',{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        data: sleepData,
+        backgroundColor: sleepData.map(v=>v>=7?'rgba(122,158,110,0.7)':'rgba(122,158,110,0.35)'),
+        borderColor:'rgba(122,158,110,0.8)', borderWidth:1,
+        borderRadius:6, borderSkipped:false
+      }]
+    },
+    options: cloneCD({
+      maintainAspectRatio:false,
+      scales:{ ...JSON.parse(JSON.stringify(CD.scales)),
+        y:{ ...JSON.parse(JSON.stringify(CD.scales.y)), min:0, max:12 }
+      }
+    })
+  });
+}
+
+// ── Boot ────────────────────────────────────────────────────────
+loadHeartChart();
+loadSummary();
+
+// Auto-refresh every 60 s to pick up new assessments
+setInterval(()=>{ loadHeartChart(); loadSummary(); }, 60000);
+</script>
 </body>
-
 </html>
