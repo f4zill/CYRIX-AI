@@ -1,8 +1,29 @@
 from flask import Flask, render_template, request, jsonify, redirect, session, make_response
-from .model import predict_risk
-from .rules import rule_check
-from .user_service import create_user, login_user
-from .db import records_collection, users_collection
+print("STARTING APP...")
+
+try:
+    from .model import predict_risk
+    print("model loaded")
+except Exception as e:
+    print("MODEL ERROR:", e)
+
+try:
+    from .rules import rule_check
+    print("rules loaded")
+except Exception as e:
+    print("RULE ERROR:", e)
+
+try:
+    from .user_service import create_user, login_user
+    print("user service loaded")
+except Exception as e:
+    print("USER SERVICE ERROR:", e)
+
+try:
+    from .db import records_collection, users_collection
+    print("db loaded")
+except Exception as e:
+    print("DB ERROR:", e)
 from datetime import datetime
 import json
 import os
