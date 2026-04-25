@@ -1,4 +1,4 @@
-from db import users_collection
+from .db import users_collection
 import uuid
 from datetime import datetime
 
