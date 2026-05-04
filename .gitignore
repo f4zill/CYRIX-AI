@@ -1,0 +1,12 @@
+# virtual environment
+cyh/
+venv/
+env/
+website/cyh/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
