@@ -1,664 +1,1518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYRIX • Health Intelligence Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --bg:#1a1208; --panel:#211a0e; --card:#2a2010; --card-alt:#241c0c;
-      --amber:#e8a835; --amber-soft:#e8a83522; --amber-glow:#e8a83540;
-      --terracotta:#c8613a; --terra-soft:#c8613a22;
-      --sage:#7a9e6e; --sage-soft:#7a9e6e1a;
-      --cream:#f0e6cc; --text:#ede4cf; --muted:#a09070;
-      --border:rgba(232,168,53,0.12); --border-warm:rgba(232,168,53,0.25);
-      --danger:#c85a3a; --warn:#d4843a;
-    }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;background:var(--bg);color:var(--text);background-image:radial-gradient(ellipse 80% 60% at 10% 0%,#2e1f0820 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 90% 100%,#1a100620 0%,transparent 60%);}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYRIX — Health Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #100a04;
+    --bg-secondary: #16100a;
+    --bg-card: rgba(255,220,160,0.04);
+    --bg-card-hover: rgba(255,220,160,0.07);
+    --border: rgba(232,168,53,0.10);
+    --border-hover: rgba(232,168,53,0.22);
+    --text-primary: #f5ead8;
+    --text-secondary: #b08a50;
+    --text-muted: #6b4e28;
+    --accent: #e8a835;
+    --accent-soft: rgba(232,168,53,0.13);
+    --green: #a8cc6a;
+    --green-soft: rgba(168,204,106,0.13);
+    --amber: #f0c060;
+    --amber-soft: rgba(240,192,96,0.13);
+    --red: #e07050;
+    --red-soft: rgba(224,112,80,0.13);
+    --purple: #d4956a;
+    --purple-soft: rgba(212,149,106,0.13);
+    --teal: #c8a060;
+    --teal-soft: rgba(200,160,96,0.10);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font-main: 'DM Sans', sans-serif;
+    --font-display: 'Syne', sans-serif;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.55);
+    --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: var(--font-main); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
 
-    /* ─── SIDEBAR ─── */
-    aside{width:240px;min-height:100vh;background:var(--panel);border-right:1px solid var(--border);padding:28px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
-    .logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:4px;color:var(--amber);text-align:center;margin-bottom:8px;}
-    .logo-sub{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:36px;}
-    .nav-section-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 12px;margin:16px 0 8px;}
-    nav ul{list-style:none;}
-    nav li{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;margin-bottom:3px;cursor:pointer;color:var(--muted);font-size:14px;font-weight:400;transition:all .2s;border:1px solid transparent;}
-    nav li:hover{background:var(--amber-soft);color:var(--amber);}
-    nav li.active{background:linear-gradient(135deg,var(--amber-soft),var(--terra-soft));color:var(--cream);border-color:var(--border-warm);}
-    nav li.active .nav-icon{color:var(--amber);}
-    .nav-icon{font-size:15px;width:18px;text-align:center;}
-    .sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--border);}
-    .user-block{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card);border:1px solid var(--border);margin-bottom:10px;}
-    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--terracotta));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#1a0e00;flex-shrink:0;}
-    .user-info p{font-size:13px;font-weight:500;color:var(--cream);}
-    .user-info span{font-size:11px;color:var(--muted);}
-    .logout-btn{width:100%;padding:10px;background:none;border:1px solid rgba(200,97,58,0.3);border-radius:8px;color:var(--terracotta);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
-    .logout-btn:hover{background:var(--terra-soft);}
+  #auth-guard {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg-primary);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+  }
+  #auth-guard.hidden { display: none; }
+  .guard-hex {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #e8a835 0%, #c8613a 100%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; animation: hexSpin 2s ease-in-out infinite;
+  }
+  @keyframes hexSpin { 0%,100%{transform:rotate(0deg) scale(1);} 50%{transform:rotate(10deg) scale(1.05);} }
+  .guard-text { font-family: var(--font-display); font-size: 15px; color: var(--text-secondary); }
+  .guard-spinner {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid rgba(232,168,53,0.15); border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── MAIN ─── */
-    main{flex:1;display:flex;flex-direction:column;overflow-x:hidden;}
-    header{padding:18px 32px;display:flex;justify-content:space-between;align-items:center;background:rgba(33,26,14,0.7);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
-    .header-left h1{font-family:'Syne',sans-serif;font-size:17px;font-weight:600;color:var(--cream);}
-    .header-left p{font-size:12px;color:var(--muted);margin-top:2px;}
-    .header-right{display:flex;align-items:center;gap:12px;}
-    .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--sage);box-shadow:0 0 0 3px var(--sage-soft);animation:pulse 2s infinite;flex-shrink:0;}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--sage-soft);}50%{box-shadow:0 0 0 6px transparent;}}
-    .badge{display:flex;align-items:center;gap:7px;background:var(--sage-soft);color:var(--sage);padding:6px 14px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid rgba(122,158,110,.25);letter-spacing:.3px;}
-    .date-badge{font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;border:1px solid var(--border);}
+  #session-modal {
+    display: none; position: fixed; inset: 0; z-index: 8888;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #session-modal.show { display: flex; }
+  .session-card {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px; max-width: 380px; width: calc(100% - 40px);
+    text-align: center; box-shadow: var(--shadow-lg);
+  }
+  .session-icon { font-size: 36px; margin-bottom: 14px; }
+  .session-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .session-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+  .session-countdown { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--amber); margin-bottom: 20px; }
+  .session-actions { display: flex; gap: 10px; justify-content: center; }
+  .btn-session {
+    padding: 11px 24px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    font-family: var(--font-main); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+  }
+  .btn-session.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-session.primary:hover { background: #c8613a; }
+  .btn-session.secondary { background: var(--bg-card); color: var(--text-secondary); }
+  .btn-session.secondary:hover { color: var(--text-primary); }
 
-    /* ─── CONTENT ─── */
-    .content{padding:28px 32px;flex:1;}
-    .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-    .section-header h2{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-    .view-all{font-size:12px;color:var(--amber);cursor:pointer;opacity:.8;text-decoration:none;}
-    .view-all:hover{opacity:1;}
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-    /* ─── STAT CARDS ─── */
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 20px;position:relative;overflow:hidden;transition:all .25s;cursor:default;}
-    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--card-accent,var(--amber)),transparent);opacity:.6;}
-    .stat-card:hover{transform:translateY(-4px);border-color:var(--border-warm);background:var(--card-alt);}
-    .stat-card .label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
-    .stat-card .value{font-family:'Syne',sans-serif;font-size:36px;font-weight:700;line-height:1;color:var(--cream);margin-bottom:8px;}
-    .stat-card .value span{font-size:16px;font-weight:400;margin-left:2px;color:var(--muted);}
-    .stat-card .sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;}
-    .trend-up{color:var(--sage);}
-    .trend-warn{color:var(--warn);}
-    .trend-ok{color:var(--amber);}
-    .trend-bad{color:var(--terracotta);}
-    .stat-icon{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .app-layout { display: flex; min-height: 100vh; }
 
-    /* ─── MAIN GRID ─── */
-    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .2s;}
-    .panel:hover{border-color:var(--border-warm);}
-    .panel h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--cream);margin-bottom:6px;}
-    .panel-subtitle{font-size:12px;color:var(--muted);margin-bottom:20px;}
-    .chart-wrap{position:relative;height:180px;}
+  .sidebar {
+    width: 240px; min-height: 100vh;
+    background: var(--bg-secondary); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; padding: 24px 0;
+  }
+  .sidebar-logo {
+    padding: 0 22px 28px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent) 0%, #c8613a 100%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .sidebar-section-label {
+    padding: 18px 22px 8px;
+    font-size: 10px; font-weight: 700; color: var(--text-muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 22px; margin: 1px 10px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    cursor: pointer; transition: var(--transition); border: 1px solid transparent;
+  }
+  .nav-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(232,168,53,0.15); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+  .sidebar-bottom { margin-top: auto; padding: 16px 22px; border-top: 1px solid var(--border); }
+  .user-pill {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: var(--radius-sm); background: var(--bg-card);
+    border: 1px solid var(--border); cursor: pointer; transition: var(--transition);
+  }
+  .user-pill:hover { border-color: var(--border-hover); }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #c8613a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 11px; color: var(--text-muted); }
+  .logout-btn {
+    font-size: 14px; color: var(--text-muted); background: none; border: none;
+    cursor: pointer; transition: var(--transition); padding: 2px;
+  }
+  .logout-btn:hover { color: var(--red); }
 
-    /* ─── INSIGHTS ─── */
-    .insight-item{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:10px;margin-bottom:10px;border:1px solid transparent;transition:all .2s;}
-    .insight-item:hover{background:rgba(255,255,255,.02);border-color:var(--border);}
-    .insight-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
-    .dot-green{background:var(--sage);box-shadow:0 0 6px var(--sage-soft);}
-    .dot-amber{background:var(--amber);box-shadow:0 0 6px var(--amber-soft);}
-    .dot-warn{background:var(--warn);}
-    .dot-red{background:var(--terracotta);}
-    .insight-text{font-size:13.5px;color:var(--text);line-height:1.5;}
-    .insight-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .main-content { margin-left: 240px; flex: 1; min-height: 100vh; background: var(--bg-primary); overflow-y: auto; }
 
-    /* ─── BOTTOM GRID ─── */
-    .bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-    .vital-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
-    .vital-row:last-child{border-bottom:none;padding-bottom:0;}
-    .vital-label{color:var(--muted);}
-    .vital-val{font-weight:500;color:var(--cream);}
-    .vital-badge{font-size:10px;padding:2px 8px;border-radius:999px;letter-spacing:.5px;}
-    .vb-good{background:var(--sage-soft);color:var(--sage);}
-    .vb-warn{background:rgba(212,132,58,.15);color:var(--warn);}
-    .vb-bad{background:var(--terra-soft);color:var(--terracotta);}
+  .topbar {
+    padding: 18px 32px; border-bottom: 1px solid var(--border);
+    background: rgba(16,10,4,0.92); backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; }
+  .topbar-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
 
-    /* ─── PROGRESS ─── */
-    .progress-item{margin-bottom:16px;}
-    .progress-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;}
-    .progress-label{color:var(--muted);}
-    .progress-val{color:var(--cream);font-weight:500;}
-    .progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;}
-    .progress-fill{height:100%;border-radius:999px;transition:width 1.2s ease;}
+  .session-indicator {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 100px;
+    background: var(--green-soft); border: 1px solid rgba(168,204,106,0.2);
+    font-size: 11px; font-weight: 600; color: var(--green);
+  }
+  .session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.6;transform:scale(1.3);} }
 
-    /* ─── CTA ─── */
-    .cta-btn{width:100%;padding:13px;margin-top:18px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--amber) 0%,var(--terracotta) 100%);color:#1a0e00;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
-    .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,168,53,.25);}
+  .page { display: none; padding: 32px; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    /* ─── EMPTY STATE ─── */
-    .no-data{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--muted);font-size:13px;gap:8px;opacity:.65;}
-    .no-data .nd-icon{font-size:28px;opacity:.4;}
+  .btn-sm {
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    font-family: var(--font-main); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: var(--transition); border: 1px solid var(--border);
+    background: var(--bg-card); color: var(--text-secondary);
+  }
+  .btn-sm:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm.primary:hover { background: #c8613a; transform: translateY(-1px); }
 
-    /* ─── RESPONSIVE ─── */
-    @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.bottom-grid{grid-template-columns:1fr 1fr;}}
-    @media(max-width:800px){.main-grid{grid-template-columns:1fr;}.bottom-grid{grid-template-columns:1fr;}}
-    @media(max-width:600px){aside{display:none;}.stats-grid{grid-template-columns:repeat(2,1fr);}.content{padding:20px 16px;}}
-  </style>
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 64px 24px; text-align: center; gap: 16px;
+  }
+  .empty-icon { font-size: 40px; opacity: 0.3; }
+  .empty-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-secondary); }
+  .empty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 320px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px; transition: var(--transition);
+    position: relative; overflow: hidden;
+  }
+  .stat-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--card-accent, var(--accent)); border-radius: var(--radius) var(--radius) 0 0; opacity: 0.6;
+  }
+  .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1; }
+  .stat-change { font-size: 12px; margin-top: 6px; color: var(--text-secondary); }
+  .stat-change.positive { color: var(--green); }
+  .stat-change.negative { color: var(--red); }
+  .stat-icon { position: absolute; top: 18px; right: 18px; font-size: 20px; opacity: 0.2; }
+  .stat-empty { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-muted); }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: var(--transition); }
+  .card:hover { border-color: var(--border-hover); }
+  .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+  .card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .card-body { padding: 24px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-65 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .mb-20 { margin-bottom: 20px; }
+  .mb-24 { margin-bottom: 24px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+  }
+  .badge-green { background: var(--green-soft); color: var(--green); border: 1px solid rgba(168,204,106,0.2); }
+  .badge-amber { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(240,192,96,0.2); }
+  .badge-red { background: var(--red-soft); color: var(--red); border: 1px solid rgba(224,112,80,0.2); }
+  .badge-blue { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(232,168,53,0.2); }
+  .badge-purple { background: var(--purple-soft); color: var(--purple); border: 1px solid rgba(212,149,106,0.2); }
+  .badge-dot::before { content: '●'; font-size: 7px; }
+
+  .risk-bar-wrap { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+  .risk-bar { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .risk-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .insight-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .insight-item:last-child { border-bottom: none; }
+  .insight-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .insight-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .insight-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  .step-indicator { display: flex; align-items: center; margin-bottom: 32px; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .step.active { color: var(--accent); }
+  .step.done { color: var(--green); }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; background: transparent; transition: var(--transition); }
+  .step.active .step-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; }
+
+  canvas { max-width: 100%; }
+  .form-range { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; }
+  .form-range::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; transition: var(--transition); }
+  .form-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .range-value { font-size: 12px; color: var(--accent); font-weight: 600; }
+
+  .notif-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); display: inline-block; animation: pulse 2s infinite; }
+
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: var(--transition); }
+  .risk-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .risk-card-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .risk-card-score { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 7px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-main); font-size: 14px; transition: var(--transition); outline: none; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(232,168,53,0.4); background: rgba(232,168,53,0.04); box-shadow: 0 0 0 3px rgba(232,168,53,0.08); }
+  .form-input::placeholder { color: var(--text-muted); }
+  .form-select option { background: #1a1208; color: var(--text-primary); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .form-section { margin-bottom: 32px; }
+  .form-section-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .bmi-display { background: var(--accent-soft); border: 1px solid rgba(232,168,53,0.2); border-radius: var(--radius-sm); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .bmi-label { font-size: 12px; color: var(--text-secondary); }
+  .bmi-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-muted); }
+  .bmi-category { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+
+  .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .rec-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: var(--transition); }
+  .rec-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .rec-icon { font-size: 24px; margin-bottom: 12px; }
+  .rec-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .rec-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .rec-priority { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 12px; }
+
+  .alert { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid; font-size: 13px; margin-bottom: 16px; }
+  .alert-amber { background: var(--amber-soft); border-color: rgba(240,192,96,0.25); color: var(--amber); }
+  .alert-red { background: var(--red-soft); border-color: rgba(224,112,80,0.25); color: var(--red); }
+  .alert-green { background: var(--green-soft); border-color: rgba(168,204,106,0.25); color: var(--green); }
+  .alert-blue { background: var(--accent-soft); border-color: rgba(232,168,53,0.25); color: var(--accent); }
+  .alert-text { color: var(--text-primary); font-size: 13px; line-height: 1.5; }
+  .alert-text strong { color: inherit; }
+
+  .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; font-size: 13px; transition: var(--transition); }
+  .checkbox-item:hover { border-color: var(--border-hover); }
+  .checkbox-item.checked { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .checkbox-item input { display: none; }
+
+  .toggle-group { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); padding: 3px; }
+  .toggle-btn { padding: 6px 14px; border-radius: 6px; border: none; font-family: var(--font-main); font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-muted); background: transparent; transition: var(--transition); }
+  .toggle-btn.active { background: var(--bg-secondary); color: var(--text-primary); box-shadow: var(--shadow); }
+
+  .timeline-item { display: flex; gap: 14px; padding: 10px 0; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 4px; position: relative; }
+  .timeline-dot::after { content: ''; position: absolute; left: 3.5px; top: 8px; width: 1px; height: calc(100% + 12px); background: var(--border); }
+  .timeline-item:last-child .timeline-dot::after { display: none; }
+  .timeline-title { font-size: 13px; font-weight: 600; }
+  .timeline-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.08); border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 20px; padding: 32px; max-width: 480px; width: calc(100% - 40px); box-shadow: var(--shadow-lg); animation: fadeIn 0.25s ease; }
+  .modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .text-muted { color: var(--text-muted); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-accent { color: var(--accent); }
+  .text-green { color: var(--green); }
+  .text-amber { color: var(--amber); }
+  .text-red { color: var(--red); }
+  .text-purple { color: var(--purple); }
+  .font-display { font-family: var(--font-display); }
+  .fw-700 { font-weight: 700; }
+  .fs-12 { font-size: 12px; }
+  .fs-13 { font-size: 13px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .w-full { width: 100%; }
+  .mb-8 { margin-bottom: 8px; }
+
+  @media (max-width: 1024px) {
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-65 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .main-content { margin-left: 0; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .page { padding: 20px; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ═══ -->
-<aside>
-  <div class="logo">CYRIX</div>
-  <div class="logo-sub">Health Intelligence</div>
+<div id="auth-guard">
+  <div class="guard-hex">⬡</div>
+  <div class="guard-text">Verifying session...</div>
+  <div class="guard-spinner"></div>
+</div>
 
-  <div class="nav-section-label">Main</div>
-  <nav><ul>
-    <li class="active" onclick="location.href='/dashboard'"><span class="nav-icon">⬡</span> Dashboard</li>
-    <li onclick="location.href='/profile'"><span class="nav-icon">◎</span> Profile</li>
-    <li onclick="location.href='/plans'"><span class="nav-icon">▦</span> Plans</li>
-    <li onclick="location.href='/records'"><span class="nav-icon">◈</span> Records</li>
-  </ul></nav>
-
-  <div class="nav-section-label">Tools</div>
-  <nav><ul>
-    <li onclick="location.href='/session'"><span class="nav-icon">◇</span> Assessment</li>
-    <li onclick="location.href='/rules'"><span class="nav-icon">◉</span> Insights</li>
-    <li onclick="location.href='/nutrition'"><span class="nav-icon">◐</span> Nutrition</li>
-  </ul></nav>
-
-  <div class="sidebar-footer">
-    <div class="user-block">
-      <div class="avatar">{{ user_name[0] | upper }}</div>
-      <div class="user-info">
-        <p>{{ user_name }}</p>
-        <span>Member</span>
-      </div>
+<div id="session-modal">
+  <div class="session-card">
+    <div class="session-icon">⏱</div>
+    <div class="session-title">Session Expiring Soon</div>
+    <div class="session-desc">Your session will expire in</div>
+    <div class="session-countdown" id="session-countdown">60</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px">seconds. Stay signed in?</div>
+    <div class="session-actions">
+      <button class="btn-session secondary" onclick="doLogout()">Sign Out</button>
+      <button class="btn-session primary" onclick="extendSession()">Stay Signed In</button>
     </div>
-    <button class="logout-btn" onclick="location.href='/logout'">Sign out</button>
   </div>
-</aside>
+</div>
 
-<!-- ═══ MAIN ═══ -->
-<main>
-  <header>
-    <div class="header-left">
-      <h1>Health Dashboard</h1>
-      <p id="headerDate">—</p>
-    </div>
-    <div class="header-right">
-      <span class="date-badge" id="weekBadge">—</span>
-      <div class="badge"><span class="pulse-dot"></span> Live Monitoring</div>
-    </div>
-  </header>
+<div class="app-layout" id="app-layout" style="display:none">
 
-  <div class="content">
-
-    <!-- ── STAT CARDS ── -->
-    <div class="section-header">
-      <h2>Overview</h2>
-      <a class="view-all" href="/records">View all records →</a>
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⬡</div>
+      CYRIX
     </div>
 
-    <div class="stats-grid">
-
-      <!-- Health Score: from Flask stats (updated per latest record) -->
-      <div class="stat-card" style="--card-accent:#e8a835;">
-        <div class="stat-icon" style="background:rgba(232,168,53,.12);color:var(--amber);">◎</div>
-        <div class="label">Health Score</div>
-        <div class="value" id="sc-score">{{ stats.health_score }}<span>%</span></div>
-        <div class="sub" id="sc-score-sub">
-          {% if stats.health_score >= 70 %}
-            <span class="trend-up">▲ Good standing</span>
-          {% elif stats.health_score >= 50 %}
-            <span class="trend-warn">● Moderate risk</span>
-          {% else %}
-            <span class="trend-bad">▼ Needs attention</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Heart Rate: from Flask stats -->
-      <div class="stat-card" style="--card-accent:#c8613a;">
-        <div class="stat-icon" style="background:rgba(200,97,58,.12);color:var(--terracotta);">♡</div>
-        <div class="label">Heart Rate</div>
-        <div class="value" id="sc-hr">{{ stats.heart_rate }}<span>bpm</span></div>
-        <div class="sub" id="sc-hr-sub">
-          {% set hr = stats.heart_rate | int %}
-          {% if hr >= 60 and hr <= 100 %}
-            <span class="trend-up">● Normal range</span>
-          {% elif hr < 60 %}
-            <span class="trend-warn">▼ Below normal</span>
-          {% else %}
-            <span class="trend-bad">▲ Elevated</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Blood Pressure: from Flask stats -->
-      <div class="stat-card" style="--card-accent:#d4843a;">
-        <div class="stat-icon" style="background:rgba(212,132,58,.12);color:var(--warn);">↑↓</div>
-        <div class="label">Blood Pressure</div>
-        <div class="value" id="sc-bp" style="font-size:28px;">{{ stats.bp }}<span>mmHg</span></div>
-        <div class="sub" id="sc-bp-sub">
-          {% set sys = stats.bp.split('/')[0] | int %}
-          {% if sys < 120 %}
-            <span class="trend-up">● Optimal</span>
-          {% elif sys < 130 %}
-            <span class="trend-ok">● Normal</span>
-          {% elif sys < 140 %}
-            <span class="trend-warn">⚠ Elevated</span>
-          {% else %}
-            <span class="trend-bad">▲ High — monitor closely</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Sleep: loaded dynamically from /api/records/summary -->
-      <div class="stat-card" style="--card-accent:#7a9e6e;">
-        <div class="stat-icon" style="background:rgba(122,158,110,.12);color:var(--sage);">◐</div>
-        <div class="label">Sleep</div>
-        <div class="value" id="sc-sleep">{{ stats.sleep }}<span>hrs</span></div>
-        <div class="sub" id="sc-sleep-sub">
-          {% set sl = stats.sleep | float %}
-          {% if sl >= 7 and sl <= 9 %}
-            <span class="trend-up">▲ Optimal range</span>
-          {% elif sl >= 6 %}
-            <span class="trend-warn">● Acceptable</span>
-          {% else %}
-            <span class="trend-bad">▼ Below target</span>
-          {% endif %}
-        </div>
-      </div>
-
-    </div><!-- /stats-grid -->
-
-    <!-- ── MAIN GRID ── -->
-    <div class="main-grid">
-
-      <!-- Heart Rate + Risk Score Chart (from /api/dashboard-data) -->
-      <div class="panel">
-        <h3 id="chartTitle">Weekly Heart Rate</h3>
-        <div class="panel-subtitle" id="chartSubtitle">Loading from your records…</div>
-        <div class="chart-wrap" id="heartChartWrap">
-          <div class="no-data"><span class="nd-icon">♡</span>Loading…</div>
-        </div>
-      </div>
-
-      <!-- Insights (from /api/records/summary latest entry) -->
-      <div class="panel">
-        <h3>Health Insights</h3>
-        <div class="panel-subtitle">Generated from your latest assessment</div>
-        <div id="insightsList">
-          <div class="no-data" style="height:140px"><span class="nd-icon">◉</span>Loading insights…</div>
-        </div>
-        <button class="cta-btn" onclick="location.href='/session'">Start New Assessment</button>
-      </div>
-
-    </div><!-- /main-grid -->
-
-    <!-- ── BOTTOM ROW ── -->
-    <div class="section-header" style="margin-top:8px;">
-      <h2>Vitals &amp; Goals</h2>
+    <div class="sidebar-section-label">My Health</div>
+    <div class="nav-item active" onclick="navTo('dash-overview',this)">
+      <span class="nav-icon">◈</span> Health Dashboard
+    </div>
+    <div class="nav-item" onclick="navTo('dash-assessment',this)">
+      <span class="nav-icon">◧</span> Health Assessment
+    </div>
+    <div class="nav-item" onclick="navTo('dash-results',this)">
+      <span class="nav-icon">◉</span> Risk Analysis
+    </div>
+    <div class="nav-item" onclick="navTo('dash-recommendations',this)">
+      <span class="nav-icon">◐</span> Recommendations
     </div>
 
-    <div class="bottom-grid">
+    <div class="sidebar-section-label">Expert Care</div>
+    <div class="nav-item" onclick="navTo('dash-consult',this)">
+      <span class="nav-icon">🩺</span> Consult Nutritionist
+    </div>
+    <div class="nav-item" onclick="navTo('dash-myplan',this)">
+      <span class="nav-icon">📋</span> My Expert Plan
+    </div>
 
-      <!-- Vitals: from latest /api/records/summary entry -->
-      <div class="panel">
-        <h3>Vital Signs</h3>
-        <div class="panel-subtitle">From your latest record</div>
-        <div id="vitalsList">
-          <div class="no-data" style="height:140px"><span class="nd-icon">◎</span>Loading…</div>
+    <div class="sidebar-bottom">
+      <div class="user-pill" onclick="showModal('modal-profile')">
+        <div class="avatar" id="sidebar-avatar">—</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">Loading...</div>
+          <div class="user-role" id="sidebar-role">—</div>
+        </div>
+        <button class="logout-btn" onclick="event.stopPropagation();confirmLogout()" title="Sign out">⏻</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="page active" id="dash-overview">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Health Dashboard</div>
+          <div class="topbar-subtitle" id="topbar-date">Loading...</div>
+        </div>
+        <div class="topbar-actions">
+          <div class="session-indicator"><div class="session-dot"></div><span id="session-status">Session Active</span></div>
+          <div class="toggle-group">
+            <button class="toggle-btn active">Weekly</button>
+            <button class="toggle-btn" onclick="toggleTab(this)">Monthly</button>
+            <button class="toggle-btn" onclick="toggleTab(this)">Quarterly</button>
+          </div>
+          <button class="btn-sm primary" onclick="navTo('dash-assessment',document.querySelectorAll('.nav-item')[1])">+ New Assessment</button>
         </div>
       </div>
 
-      <!-- Goals: averaged from last 7 days of records -->
-      <div class="panel">
-        <h3>Weekly Goals</h3>
-        <div class="panel-subtitle" id="goalsSubtitle">Progress this week</div>
-        <div id="goalsList">
-          <div class="no-data" style="height:140px"><span class="nd-icon">▦</span>Loading…</div>
+      <!-- shown only after data exists -->
+      <div style="padding:28px 32px 0" id="overview-alert" style="display:none"></div>
+
+      <div style="padding:12px 32px">
+
+        <!-- new user empty state -->
+        <div id="overview-empty" class="card mb-20">
+          <div class="empty-state">
+            <div class="empty-icon">◈</div>
+            <div class="empty-title">No health data yet</div>
+            <div class="empty-desc">Complete your first Health Assessment to unlock your personalized dashboard, risk scores, and AI-powered insights.</div>
+            <button class="btn-sm primary" style="margin-top:8px" onclick="navTo('dash-assessment',document.querySelectorAll('.nav-item')[1])">Start Assessment →</button>
+          </div>
+        </div>
+
+        <!-- populated state (hidden until data exists) -->
+        <div id="overview-data" style="display:none">
+          <div class="stat-grid">
+            <div class="stat-card" style="--card-accent:var(--accent)"><div class="stat-icon">♥</div><div class="stat-label">Overall Health Score</div><div class="stat-value" id="ov-health">—</div><div class="stat-change" id="ov-health-change">No prior data</div></div>
+            <div class="stat-card" style="--card-accent:var(--amber)"><div class="stat-icon">⚡</div><div class="stat-label">Lifestyle Risk Score</div><div class="stat-value" id="ov-risk">—</div><div class="stat-change" id="ov-risk-change">Complete assessment</div></div>
+            <div class="stat-card" style="--card-accent:var(--green)"><div class="stat-icon">💤</div><div class="stat-label">Sleep Quality</div><div class="stat-value" id="ov-sleep">—</div><div class="stat-change">From latest assessment</div></div>
+            <div class="stat-card" style="--card-accent:var(--teal)"><div class="stat-icon">💧</div><div class="stat-label">Water Intake</div><div class="stat-value" id="ov-water">—</div><div class="stat-change">From latest assessment</div></div>
+            <div class="stat-card" style="--card-accent:var(--purple)"><div class="stat-icon">🧠</div><div class="stat-label">Stress Level</div><div class="stat-value" id="ov-stress">—</div><div class="stat-change" id="ov-stress-sub">From latest assessment</div></div>
+            <div class="stat-card" style="--card-accent:var(--red)"><div class="stat-icon">⚖</div><div class="stat-label">BMI</div><div class="stat-value" id="ov-bmi">—</div><div class="stat-change" id="ov-bmi-cat">Complete assessment</div></div>
+          </div>
+
+          <div class="grid-65">
+            <div class="card mb-20">
+              <div class="card-header"><div><div class="card-title">Health Trend — Last 30 Days</div><div class="card-subtitle">Score, stress &amp; sleep tracked weekly</div></div><span class="badge badge-blue badge-dot">Live</span></div>
+              <div class="card-body"><canvas id="chart-trend" height="200"></canvas></div>
+            </div>
+            <div class="card mb-20">
+              <div class="card-header"><div class="card-title">Risk Breakdown</div></div>
+              <div class="card-body">
+                <div style="max-width:200px;margin:0 auto"><canvas id="chart-risk-donut" height="200"></canvas></div>
+                <div style="margin-top:16px" id="risk-breakdown-table">
+                  <div class="flex items-center justify-between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="fs-12 text-secondary">Obesity Risk</span><span id="rb-obesity" class="badge badge-amber">—</span></div>
+                  <div class="flex items-center justify-between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="fs-12 text-secondary">Hypertension</span><span id="rb-hyper" class="badge badge-green">—</span></div>
+                  <div class="flex items-center justify-between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="fs-12 text-secondary">Lifestyle Disorder</span><span id="rb-lifestyle" class="badge badge-amber">—</span></div>
+                  <div class="flex items-center justify-between" style="padding:6px 0"><span class="fs-12 text-secondary">Stress Burnout</span><span id="rb-burnout" class="badge badge-red">—</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card mb-20">
+              <div class="card-header"><div class="card-title">AI Lifestyle Insights</div><div class="card-subtitle">CYRIX Intelligence Engine</div></div>
+              <div class="card-body" id="ov-insights">
+                <div class="empty-state" style="padding:24px">
+                  <div class="empty-title" style="font-size:13px">Insights appear after assessment</div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-20">
+              <div class="card-header"><div class="card-title">Weekly Activity</div></div>
+              <div class="card-body"><canvas id="chart-activity" height="220"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Health Log Timeline</div></div>
+            <div class="card-body" id="ov-timeline">
+              <div class="empty-state" style="padding:24px">
+                <div class="empty-title" style="font-size:13px">No activity logged yet</div>
+                <div class="empty-desc">Your health events and milestones will appear here after your first assessment.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Sleep Chart: from /api/records/summary -->
-      <div class="panel">
-        <h3>Sleep Quality</h3>
-        <div class="panel-subtitle" id="sleepSubtitle">Hours per assessment</div>
-        <div class="chart-wrap" id="sleepChartWrap">
-          <div class="no-data"><span class="nd-icon">◐</span>Loading…</div>
+    <!-- ══ ASSESSMENT ══ -->
+    <div class="page" id="dash-assessment">
+      <div class="topbar">
+        <div><div class="topbar-title">Health Assessment</div><div class="topbar-subtitle">Complete lifestyle profile for AI risk analysis</div></div>
+        <div class="topbar-actions">
+          <button class="btn-sm" onclick="resetForm()">Reset</button>
+          <button class="btn-sm primary" onclick="submitAssessment()">Generate Analysis →</button>
         </div>
       </div>
+      <div style="padding:28px 32px">
+        <div class="step-indicator">
+          <div class="step active" id="step-1"><div class="step-dot">1</div><span>Personal</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="step-2"><div class="step-dot">2</div><span>Lifestyle</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="step-3"><div class="step-dot">3</div><span>Diet</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="step-4"><div class="step-dot">4</div><span>Activity</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="step-5"><div class="step-dot">5</div><span>Health Indicators</span></div>
+        </div>
+        <div style="max-width:760px">
 
-    </div><!-- /bottom-grid -->
+          <!-- Personal Information -->
+          <div class="form-section">
+            <div class="form-section-title"><span>👤</span> Personal Information</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="p-name" placeholder="Your full name"></div>
+              <div class="form-group"><label class="form-label">Age</label><input class="form-input" type="number" placeholder="e.g. 28" id="age-input" min="10" max="100"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Gender</label>
+                <select class="form-select" id="gender-input">
+                  <option value="" disabled selected>Select gender</option>
+                  <option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">City / State</label><input class="form-input" type="text" placeholder="e.g. Bengaluru, Karnataka"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Height (cm)</label><input class="form-input" type="number" placeholder="e.g. 170" id="height-input" oninput="calcBMI()" min="100" max="250"></div>
+              <div class="form-group"><label class="form-label">Weight (kg)</label><input class="form-input" type="number" placeholder="e.g. 70" id="weight-input" oninput="calcBMI()" min="20" max="300"></div>
+            </div>
+            <div class="bmi-display">
+              <div><div class="bmi-label">Auto-calculated BMI</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">Enter height &amp; weight above</div></div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="bmi-value" id="bmi-display">—</div>
+                <div class="bmi-category" id="bmi-cat" style="color:var(--text-muted);font-size:12px">Not calculated</div>
+              </div>
+            </div>
+          </div>
 
-  </div><!-- /content -->
-</main>
+          <!-- Lifestyle & Sleep -->
+          <div class="form-section">
+            <div class="form-section-title"><span>😴</span> Lifestyle &amp; Sleep</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Sleep Hours <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(drag to set)</span></label>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+                  <input class="form-range" type="range" min="3" max="12" value="6" id="sleep-range" oninput="updateRange('sleep-range','sleep-val',' hrs')">
+                  <span class="range-value" id="sleep-val">6 hrs</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Stress Level (1–10)</label>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+                  <input class="form-range" type="range" min="1" max="10" value="5" id="stress-range" oninput="updateRange('stress-range','stress-val','/10')">
+                  <span class="range-value" id="stress-val">5/10</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Water Intake (L)</label>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+                  <input class="form-range" type="range" min="0.5" max="4" step="0.1" value="1.5" id="water-range" oninput="updateRange('water-range','water-val','L')">
+                  <span class="range-value" id="water-val">1.5L</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Screen Time (hrs)</label>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+                  <input class="form-range" type="range" min="1" max="16" value="4" id="screen-range" oninput="updateRange('screen-range','screen-val',' hrs')">
+                  <span class="range-value" id="screen-val">4 hrs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diet -->
+          <div class="form-section">
+            <div class="form-section-title"><span>🍛</span> Diet &amp; Food Habits</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Junk Food Frequency</label>
+                <select class="form-select" id="junk-input">
+                  <option value="" disabled selected>Select frequency</option>
+                  <option>Never</option><option>1–2x/week</option><option>3–4x/week</option><option>Daily</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Sugar Intake</label>
+                <select class="form-select" id="sugar-input">
+                  <option value="" disabled selected>Select level</option>
+                  <option>Very low</option><option>Low</option><option>Moderate</option><option>High</option><option>Very high</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Protein Intake</label>
+                <select class="form-select" id="protein-input">
+                  <option value="" disabled selected>Select level</option>
+                  <option>Very low</option><option>Low (mostly carbs)</option><option>Moderate</option><option>High</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Meal Consistency</label>
+                <select class="form-select" id="meal-input">
+                  <option value="" disabled selected>Select pattern</option>
+                  <option>Irregular</option><option>Semi-regular</option><option>Consistent</option><option>Strict</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity -->
+          <div class="form-section">
+            <div class="form-section-title"><span>🏃</span> Physical Activity</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Exercise Frequency</label>
+                <select class="form-select" id="exercise-input">
+                  <option value="" disabled selected>Select frequency</option>
+                  <option>Never</option><option>1–2x/week</option><option>3–4x/week</option><option>5–6x/week</option><option>Daily</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Daily Walk (min)</label>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+                  <input class="form-range" type="range" min="0" max="120" step="5" value="0" id="walk-range" oninput="updateRange('walk-range','walk-val',' min')">
+                  <span class="range-value" id="walk-val">0 min</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="margin-bottom:12px">Workout Types <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(select all that apply)</span></label>
+              <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox"> 🧘 Yoga</label>
+                <label class="checkbox-item"><input type="checkbox"> 🏋️ Gym</label>
+                <label class="checkbox-item"><input type="checkbox"> 🚶 Walking</label>
+                <label class="checkbox-item"><input type="checkbox"> 🏊 Swimming</label>
+                <label class="checkbox-item"><input type="checkbox"> 🚴 Cycling</label>
+                <label class="checkbox-item"><input type="checkbox"> 🏃 Running</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Indicators -->
+          <div class="form-section">
+            <div class="form-section-title"><span>❤️</span> Health Indicators</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Blood Pressure</label>
+                <select class="form-select" id="bp-input">
+                  <option value="" disabled selected>Select range</option>
+                  <option>Normal (120/80)</option><option>Elevated (130–139/80–89)</option><option>High Stage 1</option><option>High Stage 2</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Resting Heart Rate (bpm)</label><input class="form-input" type="number" placeholder="e.g. 72" id="hr-input" min="40" max="200"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Smoking</label>
+              <select class="form-select" id="smoking-input">
+                <option value="" disabled selected>Select status</option>
+                <option>Non-smoker</option><option>Occasional</option><option>Regular</option><option>Heavy</option>
+              </select>
+            </div>
+          </div>
+
+          <button style="max-width:300px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition)" onclick="submitAssessment()">🧠 Generate AI Risk Analysis</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RESULTS ══ -->
+    <div class="page" id="dash-results">
+      <div class="topbar">
+        <div><div class="topbar-title">Risk Analysis Report</div><div class="topbar-subtitle" id="result-date">Complete an assessment to generate your report</div></div>
+        <div class="topbar-actions">
+          <button class="btn-sm" id="btn-export-pdf" style="opacity:0.4;pointer-events:none">↓ Export PDF</button>
+          <button class="btn-sm primary" onclick="navTo('dash-recommendations',document.querySelectorAll('.nav-item')[3])">View Recommendations →</button>
+        </div>
+      </div>
+      <div style="padding:28px 32px">
+
+        <!-- empty state before any assessment -->
+        <div id="results-empty" class="card">
+          <div class="empty-state">
+            <div class="empty-icon">◉</div>
+            <div class="empty-title">No analysis yet</div>
+            <div class="empty-desc">Submit your Health Assessment to generate your AI-powered risk report with detailed breakdowns across 28 parameters.</div>
+            <button class="btn-sm primary" style="margin-top:8px" onclick="navTo('dash-assessment',document.querySelectorAll('.nav-item')[1])">Go to Assessment →</button>
+          </div>
+        </div>
+
+        <!-- populated after assessment -->
+        <div id="results-data" style="display:none">
+          <div class="alert alert-blue"><span>◈</span><div class="alert-text">Analysis generated by CYRIX AI Engine using 28 lifestyle data points. For preventive intelligence only — consult a healthcare professional for medical decisions.</div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
+            <div class="risk-card" style="text-align:center"><div class="risk-card-label">Overall Risk</div><div class="risk-card-score" id="r-overall-score" style="color:var(--amber)">—</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">out of 100</div><span class="badge" id="r-overall-badge">—</span><div class="risk-bar-wrap" style="margin-top:14px"><div class="risk-bar" id="r-overall-bar" style="width:0%;background:var(--amber)"></div></div></div>
+            <div class="risk-card" style="text-align:center"><div class="risk-card-label">Obesity Risk</div><div class="risk-card-score" id="r-obesity-score" style="color:var(--amber)">—</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px" id="r-bmi-label">BMI —</div><span class="badge" id="r-obesity-badge">—</span><div class="risk-bar-wrap" style="margin-top:14px"><div class="risk-bar" id="r-obesity-bar" style="width:0%;background:var(--amber)"></div></div></div>
+            <div class="risk-card" style="text-align:center"><div class="risk-card-label">Hypertension Risk</div><div class="risk-card-score" id="r-hyper-score" style="color:var(--green)">—</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Based on BP &amp; lifestyle</div><span class="badge" id="r-hyper-badge">—</span><div class="risk-bar-wrap" style="margin-top:14px"><div class="risk-bar" id="r-hyper-bar" style="width:0%;background:var(--green)"></div></div></div>
+            <div class="risk-card" style="text-align:center"><div class="risk-card-label">Stress Burnout</div><div class="risk-card-score" id="r-stress-score" style="color:var(--red)">—</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px" id="r-stress-label">Based on inputs</div><span class="badge" id="r-stress-badge">—</span><div class="risk-bar-wrap" style="margin-top:14px"><div class="risk-bar" id="r-stress-bar" style="width:0%;background:var(--red)"></div></div></div>
+          </div>
+          <div class="grid-65">
+            <div class="card mb-20"><div class="card-header"><div><div class="card-title">Feature Importance</div><div class="card-subtitle">Explainable AI · Risk drivers</div></div></div><div class="card-body"><canvas id="chart-importance" height="260"></canvas></div></div>
+            <div>
+              <div class="card mb-20"><div class="card-header"><div class="card-title">AI Confidence</div></div><div class="card-body" style="text-align:center;padding:28px 24px">
+                <svg width="110" height="110" viewBox="0 0 110 110">
+                  <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+                  <circle cx="55" cy="55" r="46" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="289" id="conf-ring" stroke-dashoffset="289" transform="rotate(-90 55 55)"/>
+                </svg>
+                <div style="font-family:var(--font-display);font-size:26px;font-weight:800;margin-top:8px" id="conf-pct">—</div>
+                <div style="font-size:12px;color:var(--text-muted)">Model Confidence</div>
+              </div></div>
+              <div class="card"><div class="card-header"><div class="card-title">Lifestyle Disorder Risk</div></div><div class="card-body" style="text-align:center"><div style="font-family:var(--font-display);font-size:40px;font-weight:800;color:var(--amber)" id="r-lifestyle-score">—</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Based on diet &amp; activity</div><span class="badge" id="r-lifestyle-badge">—</span></div></div>
+            </div>
+          </div>
+          <div class="card"><div class="card-header"><div class="card-title">Health Parameter Breakdown</div></div><div class="card-body" style="padding:0"><table class="data-table" id="param-table"><thead><tr><th>Parameter</th><th>Your Value</th><th>Optimal</th><th>Status</th><th>Risk</th></tr></thead><tbody id="param-tbody"></tbody></table></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RECOMMENDATIONS ══ -->
+    <div class="page" id="dash-recommendations">
+      <div class="topbar">
+        <div><div class="topbar-title">Personalized Recommendations</div><div class="topbar-subtitle">AI-generated lifestyle optimization plan · India-specific</div></div>
+        <div class="topbar-actions"><button class="btn-sm" id="btn-export-plan" style="opacity:0.4;pointer-events:none">↓ Export Plan</button></div>
+      </div>
+      <div style="padding:28px 32px">
+
+        <div id="rec-empty" class="card">
+          <div class="empty-state">
+            <div class="empty-icon">◐</div>
+            <div class="empty-title">No recommendations yet</div>
+            <div class="empty-desc">Submit your Health Assessment first. CYRIX will generate a personalized India-specific plan based on your risk profile.</div>
+            <button class="btn-sm primary" style="margin-top:8px" onclick="navTo('dash-assessment',document.querySelectorAll('.nav-item')[1])">Go to Assessment →</button>
+          </div>
+        </div>
+
+        <div id="rec-data" style="display:none">
+          <div class="alert alert-green"><span>✓</span><div class="alert-text">Your personalized plan is ready. Following these consistently for 8 weeks can reduce your risk score by an estimated <strong>15–20 points</strong>.</div></div>
+          <div style="font-family:var(--font-display);font-size:14px;font-weight:600;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:20px">🔴 High Priority — Immediate Action</div>
+          <div class="rec-grid mb-24">
+            <div class="rec-card" style="border-color:rgba(224,112,80,0.2)"><div class="rec-icon">🧠</div><div class="rec-title">Stress Reduction Protocol</div><div class="rec-text">Begin daily 20-min Pranayama or guided meditation. Reduce decision fatigue by batching work tasks. Limit social media after 9 PM.</div><div class="rec-priority text-red">● Critical Priority</div></div>
+            <div class="rec-card" style="border-color:rgba(224,112,80,0.2)"><div class="rec-icon">😴</div><div class="rec-title">Sleep Optimization</div><div class="rec-text">Target 7.5–8 hrs. Fix 10:30 PM sleep time. Avoid phone 1 hr before bed. Try turmeric milk or chamomile.</div><div class="rec-priority text-red">● Critical Priority</div></div>
+            <div class="rec-card" style="border-color:rgba(224,112,80,0.2)"><div class="rec-icon">🍱</div><div class="rec-title">Junk Food Reduction</div><div class="rec-text">Prep 3 tiffins weekly. Substitute chips with roasted chana/makhana. Switch cold drinks for nimbu paani. Allow 1 cheat meal/week.</div><div class="rec-priority text-red">● Critical Priority</div></div>
+          </div>
+          <div style="font-family:var(--font-display);font-size:14px;font-weight:600;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:20px">🟡 Medium Priority — Weekly Goals</div>
+          <div class="rec-grid mb-24">
+            <div class="rec-card" style="border-color:rgba(240,192,96,0.2)"><div class="rec-icon">🥗</div><div class="rec-title">Indian Diet Optimization</div><div class="rec-text">Replace 50% white rice with brown rice/jowar/ragi. Add dal daily. Include raw salad. Try multigrain atta.</div><div class="rec-priority text-amber">● Medium Priority</div></div>
+            <div class="rec-card" style="border-color:rgba(240,192,96,0.2)"><div class="rec-icon">💧</div><div class="rec-title">Hydration Strategy</div><div class="rec-text">Target 2.5L/day. Start with 500ml on waking. Set 90-min reminders. Infuse with mint/lemon. Buttermilk counts.</div><div class="rec-priority text-amber">● Medium Priority</div></div>
+            <div class="rec-card" style="border-color:rgba(240,192,96,0.2)"><div class="rec-icon">🚶</div><div class="rec-title">Sedentary Break Protocol</div><div class="rec-text">Stand every 45 mins for 5 mins. 10-min walk post lunch. 10 squats per hour. Aim 7,000 steps/day initially.</div><div class="rec-priority text-amber">● Medium Priority</div></div>
+          </div>
+          <div class="card"><div class="card-header"><div class="card-title">8-Week Progress Projection</div><div class="card-subtitle">Estimated if recommendations followed</div></div><div class="card-body"><canvas id="chart-projection" height="160"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONSULT NUTRITIONIST ══ -->
+    <div class="page" id="dash-consult">
+      <div class="topbar">
+        <div><div class="topbar-title">Consult a Nutritionist</div><div class="topbar-subtitle">Connect with verified Indian nutrition experts · Powered by CYRIX AI insights</div></div>
+        <div class="topbar-actions">
+          <div class="session-indicator" id="report-ready-badge" style="display:none;background:var(--green-soft);border-color:rgba(168,204,106,0.2);color:var(--green)"><div class="session-dot"></div><span>AI Risk Report Ready</span></div>
+        </div>
+      </div>
+      <div style="padding:28px 32px">
+
+        <div style="background:linear-gradient(135deg,rgba(232,168,53,0.12) 0%,rgba(200,96,58,0.1) 100%);border:1px solid rgba(232,168,53,0.2);border-radius:var(--radius);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:6px">Your CYRIX AI Risk Report will be shared automatically</div>
+            <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">Your nutritionist receives your full assessment data, ML risk predictions, and lifestyle inputs — so you don't have to repeat yourself.</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-shrink:0">
+            <button class="btn-sm" id="btn-preview-report">Preview My Report</button>
+            <button class="btn-sm primary" onclick="showModal('modal-quickrequest')">Quick Request →</button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em">Filter by:</span>
+          <button class="toggle-btn active" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">All</button>
+          <button class="toggle-btn" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">Weight Loss</button>
+          <button class="toggle-btn" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">PCOS</button>
+          <button class="toggle-btn" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">Diabetes</button>
+          <button class="toggle-btn" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">Stress &amp; Burnout</button>
+          <button class="toggle-btn" onclick="toggleTab(this)" style="border:1px solid var(--border);border-radius:100px;padding:6px 14px">Heart Health</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-bottom:28px">
+
+          <div class="card" style="transition:var(--transition)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="padding:22px 22px 0">
+              <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+                <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#e8a835,#c8613a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">MN</div>
+                <div style="flex:1"><div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:3px">Dr. Meera Nair</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">MSc Nutrition · Bengaluru</div><div style="display:flex;flex-wrap:wrap;gap:5px"><span class="badge badge-amber">Weight Loss</span><span class="badge badge-blue">Diabetes</span></div></div>
+                <div style="text-align:right;flex-shrink:0"><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--accent)">₹499</div><div style="font-size:10px;color:var(--text-muted)">per session</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border-radius:var(--radius-sm)">
+                <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--amber)">★ 4.9</div><div style="font-size:10px;color:var(--text-muted)">Rating</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700">8 yrs</div><div style="font-size:10px;color:var(--text-muted)">Experience</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--green)">247</div><div style="font-size:10px;color:var(--text-muted)">Clients</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">"Specializes in Indian dietary patterns, vegetarian meal planning, and lifestyle-based disease prevention."</div>
+            </div>
+            <div style="padding:0 22px 20px;display:flex;gap:8px"><button class="btn-sm" style="flex:1">View Profile</button><button class="btn-sm primary" style="flex:1" onclick="showModal('modal-booking')">Book Consultation</button></div>
+          </div>
+
+          <div class="card" style="transition:var(--transition)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="padding:22px 22px 0">
+              <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+                <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#a8cc6a,#5a9a3a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">RG</div>
+                <div style="flex:1"><div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:3px">Rohit Gupta</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">RD, CSSD · Mumbai</div><div style="display:flex;flex-wrap:wrap;gap:5px"><span class="badge badge-green">Stress &amp; Burnout</span><span class="badge badge-purple">Gut Health</span></div></div>
+                <div style="text-align:right;flex-shrink:0"><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--accent)">₹699</div><div style="font-size:10px;color:var(--text-muted)">per session</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border-radius:var(--radius-sm)">
+                <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--amber)">★ 4.8</div><div style="font-size:10px;color:var(--text-muted)">Rating</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700">11 yrs</div><div style="font-size:10px;color:var(--text-muted)">Experience</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--green)">385</div><div style="font-size:10px;color:var(--text-muted)">Clients</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">"Expert in stress-related eating disorders, burnout recovery diets, and South Indian meal adaptations."</div>
+            </div>
+            <div style="padding:0 22px 20px;display:flex;gap:8px"><button class="btn-sm" style="flex:1">View Profile</button><button class="btn-sm primary" style="flex:1" onclick="showModal('modal-booking')">Book Consultation</button></div>
+          </div>
+
+          <div class="card" style="transition:var(--transition)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="padding:22px 22px 0">
+              <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+                <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#d4956a,#9a5030);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">PK</div>
+                <div style="flex:1"><div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:3px">Dr. Priya Krishnan</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">PhD Clinical Nutrition · Chennai</div><div style="display:flex;flex-wrap:wrap;gap:5px"><span class="badge badge-red">PCOS</span><span class="badge badge-amber">Thyroid</span></div></div>
+                <div style="text-align:right;flex-shrink:0"><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--accent)">₹899</div><div style="font-size:10px;color:var(--text-muted)">per session</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border-radius:var(--radius-sm)">
+                <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--amber)">★ 5.0</div><div style="font-size:10px;color:var(--text-muted)">Rating</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700">14 yrs</div><div style="font-size:10px;color:var(--text-muted)">Experience</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--green)">502</div><div style="font-size:10px;color:var(--text-muted)">Clients</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">"Hormonal health specialist, PCOS diet protocols, traditional Indian Ayurvedic food principles."</div>
+            </div>
+            <div style="padding:0 22px 20px;display:flex;gap:8px"><button class="btn-sm" style="flex:1">View Profile</button><button class="btn-sm primary" style="flex:1" onclick="showModal('modal-booking')">Book Consultation</button></div>
+          </div>
+
+          <div class="card" style="transition:var(--transition)" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="padding:22px 22px 0">
+              <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+                <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c8a060,#806040);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">AV</div>
+                <div style="flex:1"><div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:3px">Ananya Verma</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">M.Sc Dietetics · Delhi</div><div style="display:flex;flex-wrap:wrap;gap:5px"><span class="badge badge-blue">Heart Health</span><span class="badge badge-green">Senior Wellness</span></div></div>
+                <div style="text-align:right;flex-shrink:0"><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--accent)">₹599</div><div style="font-size:10px;color:var(--text-muted)">per session</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--bg-card);border-radius:var(--radius-sm)">
+                <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--amber)">★ 4.7</div><div style="font-size:10px;color:var(--text-muted)">Rating</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700">6 yrs</div><div style="font-size:10px;color:var(--text-muted)">Experience</div></div>
+                <div style="width:1px;height:32px;background:var(--border)"></div>
+                <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--green)">183</div><div style="font-size:10px;color:var(--text-muted)">Clients</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">"Cardiovascular diet management, sodium-controlled Indian meal planning, hypertension reversal."</div>
+            </div>
+            <div style="padding:0 22px 20px;display:flex;gap:8px"><button class="btn-sm" style="flex:1">View Profile</button><button class="btn-sm primary" style="flex:1" onclick="showModal('modal-booking')">Book Consultation</button></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MY EXPERT PLAN ══ -->
+    <div class="page" id="dash-myplan">
+      <div class="topbar">
+        <div><div class="topbar-title">My Expert Plan</div><div class="topbar-subtitle" id="myplan-subtitle">No active plan yet</div></div>
+        <div class="topbar-actions">
+          <button class="btn-sm" id="btn-dl-plan" style="opacity:0.4;pointer-events:none">↓ Download PDF</button>
+          <button class="btn-sm primary" onclick="navTo('dash-consult',document.querySelectorAll('.nav-item')[4])">Book Consultation →</button>
+        </div>
+      </div>
+      <div style="padding:28px 32px">
+
+        <div id="myplan-empty" class="card">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No expert plan yet</div>
+            <div class="empty-desc">Book a consultation with one of our nutritionists. After your session, your personalized plan will appear here — automatically linked to your CYRIX risk report.</div>
+            <button class="btn-sm primary" style="margin-top:8px" onclick="navTo('dash-consult',document.querySelectorAll('.nav-item')[4])">Find a Nutritionist →</button>
+          </div>
+        </div>
+
+        <!-- plan content (shown only after booking + consultation) -->
+        <div id="myplan-data" style="display:none">
+          <div class="alert alert-green"><span>✓</span><div class="alert-text">Your personalized plan from <strong id="plan-nutritionist">Dr. Meera Nair</strong> is active. Consultation on <strong id="plan-date">—</strong> · Duration: 45 mins · Risk report was shared automatically.</div></div>
+
+          <div style="background:linear-gradient(135deg,rgba(232,168,53,0.08),rgba(200,96,58,0.06));border:1px solid rgba(232,168,53,0.15);border-radius:var(--radius);padding:22px 24px;margin-bottom:24px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#e8a835,#c8613a);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0" id="plan-avatar">MN</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:4px" id="plan-note-from">Note from Dr. Meera Nair</div>
+              <div style="font-size:13px;color:var(--text-secondary);line-height:1.7" id="plan-note-text">Based on your CYRIX risk profile, I've designed a 4-week plan focusing on reducing cortisol through food timing, gut-brain axis support, and gradual caloric optimization using Indian whole foods.</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:8px" id="plan-note-meta">—</div>
+            </div>
+          </div>
+
+          <div class="grid-2 mb-20">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Weekly Meal Structure</div><div class="card-subtitle">Indian whole-food protocol</div></div>
+              <div class="card-body" style="padding:0">
+                <table class="data-table">
+                  <thead><tr><th>Meal</th><th>What to Eat</th><th>Time</th></tr></thead>
+                  <tbody>
+                    <tr><td class="fw-700">Early Morning</td><td>Warm jeera water + 5 soaked almonds</td><td style="color:var(--text-muted)">6:30 AM</td></tr>
+                    <tr><td class="fw-700">Breakfast</td><td>2 ragi dosas + moong dal chutney + 1 fruit</td><td style="color:var(--text-muted)">8:00 AM</td></tr>
+                    <tr><td class="fw-700">Mid-Morning</td><td>Buttermilk or green tea + roasted chana</td><td style="color:var(--text-muted)">11:00 AM</td></tr>
+                    <tr><td class="fw-700">Lunch</td><td>Brown rice / jowar roti + dal + sabzi + salad + curd</td><td style="color:var(--text-muted)">1:00 PM</td></tr>
+                    <tr><td class="fw-700">Evening Snack</td><td>Makhana or sprouts chaat + nimbu paani</td><td style="color:var(--text-muted)">4:30 PM</td></tr>
+                    <tr><td class="fw-700">Dinner</td><td>2 multigrain rotis + palak/methi sabzi + dal soup</td><td style="color:var(--text-muted)">7:30 PM</td></tr>
+                    <tr><td class="fw-700">Bedtime</td><td>Turmeric milk — no sugar</td><td style="color:var(--text-muted)">10:00 PM</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <div class="card mb-20">
+                <div class="card-header"><div class="card-title">Focus Areas</div><div class="card-subtitle">Based on your AI risk report</div></div>
+                <div class="card-body">
+                  <div class="insight-item"><div class="insight-icon" style="background:var(--red-soft);color:var(--red)">🧠</div><div><div class="insight-title">Stress Cortisol Foods</div><div class="insight-desc">Add ashwagandha powder to warm milk. Increase Vit C (amla, lemon). Avoid excess caffeine.</div></div></div>
+                  <div class="insight-item"><div class="insight-icon" style="background:var(--amber-soft);color:var(--amber)">⚖️</div><div><div class="insight-title">Caloric Correction</div><div class="insight-desc">Target 1,800 kcal/day. Reduce maida, white rice portion by 50%. Substitute with jowar/bajra.</div></div></div>
+                  <div class="insight-item"><div class="insight-icon" style="background:var(--green-soft);color:var(--green)">💧</div><div><div class="insight-title">Hydration Protocol</div><div class="insight-desc">2.5L water/day. Start morning with 500ml. Coconut water 3x/week.</div></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header"><div class="card-title">Progress Tracking</div><div class="card-subtitle">Week 1 of 4</div></div>
+                <div class="card-body">
+                  <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text-secondary)">Plan Adherence</span><span class="fw-700 text-green">0%</span></div><div class="risk-bar-wrap"><div class="risk-bar" style="width:0%;background:var(--green)"></div></div></div>
+                  <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text-secondary)">Stress Score Reduction</span><span class="fw-700 text-amber">0 pts</span></div><div class="risk-bar-wrap"><div class="risk-bar" style="width:0%;background:var(--amber)"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text-secondary)">Hydration Goal</span><span class="fw-700" style="color:var(--teal)">0L / 2.5L</span></div><div class="risk-bar-wrap"><div class="risk-bar" style="width:0%;background:var(--teal)"></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Foods — Avoid / Reduce / Prefer</div><div class="card-subtitle">Nutritionist-curated India-specific guidance</div></div>
+            <div class="card-body">
+              <div class="grid-3" style="margin:0">
+                <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:12px">🚫 Avoid</div><div class="rec-card" style="border-color:rgba(224,112,80,0.15);padding:14px"><div class="rec-text">Maida, deep-fried snacks, packaged biscuits, cold drinks, instant noodles, white bread, excess tea/coffee</div></div></div>
+                <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--amber);margin-bottom:12px">⚠ Reduce</div><div class="rec-card" style="border-color:rgba(240,192,96,0.15);padding:14px"><div class="rec-text">White rice, white sugar, ghee (max 1 tsp/day), full-fat paneer, potato fry, pickle (high sodium), jaggery</div></div></div>
+                <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:12px">✓ Prefer</div><div class="rec-card" style="border-color:rgba(168,204,106,0.15);padding:14px"><div class="rec-text">Ragi, jowar, bajra, moong dal, palak, methi, amla, curd, sprouts, roasted chana, makhana, idli, dhokla, oats</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal">
+    <div class="modal-title">Profile Settings</div>
+    <div class="modal-desc">Manage your account preferences</div>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="modal-name-input" value=""></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="modal-email-input" value="" type="email" readonly style="opacity:0.6;cursor:not-allowed"></div>
+    <div class="form-group"><label class="form-label">Notification Preferences</label><select class="form-select"><option>All alerts enabled</option><option>High-risk alerts only</option><option>Weekly digest only</option></select></div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal('modal-profile')">Cancel</button><button class="btn-sm primary" onclick="closeModal('modal-profile')">Save Changes</button></div>
+  </div>
+</div>
+
+<!-- ANALYSIS LOADING MODAL -->
+<div class="modal-overlay" id="modal-analysis">
+  <div class="modal" style="text-align:center;padding:48px">
+    <div style="font-size:32px;margin-bottom:16px">🧠</div>
+    <div class="modal-title">CYRIX AI Engine Running</div>
+    <div class="modal-desc">Analyzing 28 lifestyle parameters...</div>
+    <div class="spinner" style="margin:20px auto"></div>
+    <div id="analysis-progress" style="font-size:12px;color:var(--text-muted);margin-top:16px">Initializing prediction models...</div>
+  </div>
+</div>
+
+<!-- CONFIRM LOGOUT MODAL -->
+<div class="modal-overlay" id="modal-logout">
+  <div class="modal">
+    <div class="modal-title">Sign Out</div>
+    <div class="modal-desc">Are you sure you want to sign out of CYRIX? Your session data will be cleared.</div>
+    <div class="modal-actions"><button class="btn-sm" onclick="closeModal('modal-logout')">Cancel</button><button class="btn-sm" style="background:var(--red);border-color:var(--red);color:#fff" onclick="doLogout()">Sign Out</button></div>
+  </div>
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  CYRIX Dashboard — dynamic layer
-//  Flask already injected: stats.health_score, stats.heart_rate,
-//  stats.bp, stats.sleep, user_name  (via Jinja2 above)
-//
-//  This JS layer fetches:
-//    /api/dashboard-data  → { labels, heart, sleep }
-//    /api/records/summary → { entries: [...] }
-//  and fills charts, insights, vitals, goals.
-// ═══════════════════════════════════════════════════════════════
+  const API_BASE = 'http://127.0.0.1:5000/api';
+  const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+  const SESSION_WARN_MS   = 29 * 60 * 1000;
+  let sessionTimer = null, warnTimer = null, countdownTimer = null, countdownSeconds = 60;
 
-// ── Utilities ───────────────────────────────────────────────────
-const $  = id => document.getElementById(id);
-const CD = {
-  responsive:true, maintainAspectRatio:false,
-  plugins:{ legend:{display:false}, tooltip:{
-    backgroundColor:'#2a2010', titleColor:'#f0e6cc', bodyColor:'#a09070',
-    borderColor:'rgba(232,168,53,0.25)', borderWidth:1, padding:10, cornerRadius:8
-  }},
-  scales:{
-    x:{ grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}, ticks:{color:'#a09070',font:{size:10},maxRotation:0} },
-    y:{ grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}, ticks:{color:'#a09070',font:{size:10}}, border:{display:false} }
+  // Track whether user has submitted an assessment this session
+  let assessmentData = null;
+
+  // ── AUTH ──
+  (async function enforceAuth() {
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify`, { method:'GET', credentials:'include' });
+      if (!res.ok) { window.location.replace('/login.html'); return; }
+      const data = await res.json();
+      bootApp(data.user);
+    } catch { window.location.replace('/login.html'); }
+  })();
+
+  function clearStoredAuth() {
+    sessionStorage.removeItem('cyrix_token'); sessionStorage.removeItem('cyrix_user');
+    localStorage.removeItem('cyrix_token'); localStorage.removeItem('cyrix_user');
   }
-};
-function cloneCD(extra={}){ return Object.assign(JSON.parse(JSON.stringify(CD)), extra); }
 
-let _charts = {};
-function mkChart(id, cfg){
-  if(_charts[id]) _charts[id].destroy();
-  _charts[id] = new Chart($(id), cfg);
-  return _charts[id];
-}
+  function bootApp(user) {
+    document.getElementById('auth-guard').classList.add('hidden');
+    document.getElementById('app-layout').style.display = 'flex';
 
-function riskClass(r=''){
-  const v = r.toLowerCase();
-  if(v.includes('low'))  return 'low';
-  if(v.includes('high')) return 'high';
-  return 'medium';
-}
+    const firstName = user.firstName || user.name || 'User';
+    const lastName  = user.lastName  || '';
+    const displayName = (firstName + ' ' + lastName).trim();
+    const initials = (firstName[0] + (lastName[0] || '')).toUpperCase();
+    const roleLabels = { user:'Individual User', diet:'Diet Expert', fitness:'Fitness Coach', corporate:'Corporate HR', admin:'Platform Admin' };
 
-function bpBadge(sys){
-  if(!sys)       return {label:'No data', cls:'vb-warn'};
-  if(sys < 120)  return {label:'Optimal',  cls:'vb-good'};
-  if(sys < 130)  return {label:'Normal',   cls:'vb-good'};
-  if(sys < 140)  return {label:'Elevated', cls:'vb-warn'};
-  return              {label:'High',     cls:'vb-bad'};
-}
-function cholBadge(c){
-  if(!c)      return {label:'No data',    cls:'vb-warn'};
-  if(c < 200) return {label:'Optimal',   cls:'vb-good'};
-  if(c < 240) return {label:'Borderline',cls:'vb-warn'};
-  return           {label:'High',       cls:'vb-bad'};
-}
-function sleepBadge(s){
-  if(!s)               return {label:'No data',   cls:'vb-warn'};
-  if(s >= 7 && s <= 9) return {label:'Optimal',   cls:'vb-good'};
-  if(s >= 6)           return {label:'Acceptable', cls:'vb-warn'};
-  return                     {label:'Low',        cls:'vb-bad'};
-}
+    document.getElementById('sidebar-name').textContent = displayName;
+    document.getElementById('sidebar-avatar').textContent = initials;
+    document.getElementById('sidebar-role').textContent = roleLabels[user.role] || user.role;
+    document.getElementById('modal-name-input').value = displayName;
+    document.getElementById('modal-email-input').value = user.email || '';
 
-function numAvg(arr, key){
-  const v = arr.map(r=>parseFloat(r[key])).filter(x=>!isNaN(x)&&x>0);
-  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
-}
+    const now = new Date();
+    document.getElementById('topbar-date').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' · No assessment today';
 
-function weekOf(d){
-  const jan1 = new Date(d.getFullYear(),0,1);
-  const wk   = Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
-  return `Q${Math.ceil((d.getMonth()+1)/3)} · Week ${wk}`;
-}
+    // Init range readouts (slider defaults — no fake health data)
+    syncAllSliders();
 
-// ── Date header ─────────────────────────────────────────────────
-(function(){
-  const now = new Date();
-  $('headerDate').textContent =
-    now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
-    ' · Weekly overview';
-  $('weekBadge').textContent = weekOf(now);
-})();
+    startSessionWatcher();
+    ['mousemove','keydown','click','scroll','touchstart'].forEach(evt =>
+      document.addEventListener(evt, resetActivityTimer, { passive:true })
+    );
 
-// ── /api/dashboard-data → Heart Rate line chart ─────────────────
-async function loadHeartChart(){
-  try {
-    const res  = await fetch('/api/dashboard-data');
-    const data = await res.json();
+    // Attempt to load saved assessment from backend
+    loadSavedAssessment(user);
+  }
 
-    if(!data.labels || !data.heart || !data.heart.length){
-      $('heartChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">♡</span>No heart rate data yet</div>';
+  async function loadSavedAssessment(user) {
+    try {
+      const res = await fetch(`${API_BASE}/health/latest`, { credentials:'include' });
+      if (res.ok) {
+        const saved = await res.json();
+        if (saved && saved.scores) { applyAssessmentResults(saved); }
+      }
+    } catch { /* no saved data — stay in empty state */ }
+  }
+
+  // ── SESSION ──
+  function startSessionWatcher() { resetActivityTimer(); }
+  function resetActivityTimer() {
+    clearTimeout(sessionTimer); clearTimeout(warnTimer);
+    sessionTimer = setTimeout(doLogout, SESSION_TIMEOUT_MS);
+    warnTimer    = setTimeout(showSessionWarning, SESSION_WARN_MS);
+  }
+  function showSessionWarning() {
+    countdownSeconds = 60;
+    document.getElementById('session-countdown').textContent = countdownSeconds;
+    document.getElementById('session-modal').classList.add('show');
+    countdownTimer = setInterval(() => {
+      countdownSeconds--;
+      document.getElementById('session-countdown').textContent = countdownSeconds;
+      if (countdownSeconds <= 0) { clearInterval(countdownTimer); doLogout(); }
+    }, 1000);
+  }
+  function extendSession() {
+    clearInterval(countdownTimer);
+    document.getElementById('session-modal').classList.remove('show');
+    fetch(`${API_BASE}/auth/verify`, { credentials:'include' }).catch(() => {});
+    resetActivityTimer();
+  }
+
+  // ── LOGOUT ──
+  function confirmLogout() { showModal('modal-logout'); }
+  async function doLogout() {
+    clearInterval(countdownTimer); clearTimeout(sessionTimer); clearTimeout(warnTimer);
+    try { await fetch(`${API_BASE}/auth/logout`, { method:'GET', credentials:'include' }); } catch {}
+    clearStoredAuth();
+    window.location.replace('/login.html');
+  }
+
+  // ── NAVIGATION ──
+  let chartsInitialized = false;
+  function navTo(pageId, navEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const page = document.getElementById(pageId);
+    if (page) page.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+    setTimeout(() => {
+      if (!chartsInitialized) { initAllCharts(); chartsInitialized = true; }
+      else reinitChartsForPage(pageId);
+    }, 80);
+  }
+
+  // ── FORMS ──
+  function syncAllSliders() {
+    updateRange('sleep-range',  'sleep-val',  ' hrs');
+    updateRange('stress-range', 'stress-val', '/10');
+    updateRange('water-range',  'water-val',  'L');
+    updateRange('screen-range', 'screen-val', ' hrs');
+    updateRange('walk-range',   'walk-val',   ' min');
+  }
+
+  function calcBMI() {
+    const h = parseFloat(document.getElementById('height-input').value);
+    const w = parseFloat(document.getElementById('weight-input').value);
+    const bmiEl  = document.getElementById('bmi-display');
+    const catEl  = document.getElementById('bmi-cat');
+    if (!h || !w || h < 50 || w < 10) {
+      bmiEl.textContent = '—'; bmiEl.style.color = 'var(--text-muted)';
+      catEl.textContent = 'Not calculated'; catEl.className = 'bmi-category'; catEl.style.color = 'var(--text-muted)';
+      return;
+    }
+    const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+    bmiEl.textContent = bmi; bmiEl.style.color = 'var(--accent)';
+    const [label, cls] = bmi < 18.5 ? ['Underweight','badge badge-blue'] :
+                         bmi < 25   ? ['Normal',      'badge badge-green'] :
+                         bmi < 30   ? ['Overweight',  'badge badge-amber'] :
+                                      ['Obese',       'badge badge-red'];
+    catEl.textContent = label; catEl.className = 'bmi-category ' + cls; catEl.style.color = '';
+  }
+
+  function updateRange(rangeId, valId, suffix) {
+    const el = document.getElementById(rangeId);
+    const out = document.getElementById(valId);
+    if (!el || !out) return;
+    const v = parseFloat(el.value);
+    if (suffix === '/10') out.textContent = v + '/10';
+    else if (suffix === 'L') out.textContent = parseFloat(v).toFixed(1) + 'L';
+    else out.textContent = v + (suffix || '');
+  }
+
+  function resetForm() {
+    document.getElementById('p-name').value = '';
+    document.getElementById('age-input').value = '';
+    document.getElementById('height-input').value = '';
+    document.getElementById('weight-input').value = '';
+    document.getElementById('gender-input').selectedIndex = 0;
+    document.getElementById('junk-input').selectedIndex = 0;
+    document.getElementById('sugar-input').selectedIndex = 0;
+    document.getElementById('protein-input').selectedIndex = 0;
+    document.getElementById('meal-input').selectedIndex = 0;
+    document.getElementById('exercise-input').selectedIndex = 0;
+    document.getElementById('bp-input').selectedIndex = 0;
+    document.getElementById('smoking-input').selectedIndex = 0;
+    document.getElementById('hr-input').value = '';
+    ['sleep-range','stress-range','water-range','screen-range','walk-range'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = el.getAttribute('value') || el.min; }
+    });
+    document.querySelectorAll('.checkbox-item').forEach(i => {
+      i.classList.remove('checked');
+      const cb = i.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = false;
+    });
+    calcBMI(); syncAllSliders();
+  }
+
+  // ── ASSESSMENT SUBMIT & RESULT POPULATION ──
+  function submitAssessment() {
+    // Collect form values
+    const name    = document.getElementById('p-name').value.trim();
+    const age     = parseInt(document.getElementById('age-input').value) || 0;
+    const height  = parseFloat(document.getElementById('height-input').value) || 0;
+    const weight  = parseFloat(document.getElementById('weight-input').value) || 0;
+    const sleep   = parseFloat(document.getElementById('sleep-range').value);
+    const stress  = parseInt(document.getElementById('stress-range').value);
+    const water   = parseFloat(document.getElementById('water-range').value);
+    const screen  = parseInt(document.getElementById('screen-range').value);
+    const walk    = parseInt(document.getElementById('walk-range').value);
+    const junk    = document.getElementById('junk-input').value || '';
+    const bp      = document.getElementById('bp-input').value || '';
+    const hr      = parseInt(document.getElementById('hr-input').value) || 0;
+
+    if (!name || !age || !height || !weight) {
+      alert('Please fill in Name, Age, Height and Weight before generating your analysis.');
       return;
     }
 
-    $('chartTitle').textContent    = 'Weekly Heart Rate';
-    $('chartSubtitle').textContent = `Last ${data.labels.length} days · avg ${Math.round(data.heart.reduce((a,b)=>a+b,0)/data.heart.length)} bpm`;
+    const modal = document.getElementById('modal-analysis');
+    modal.classList.add('active');
+    const msgs = ['Initializing prediction models...','Encoding 28 lifestyle features...','Running Gradient Boosted Classifier...','Calculating risk scores...','Generating explainable AI insights...','Building personalized recommendations...','Analysis complete!'];
+    let i = 0;
+    const prog = document.getElementById('analysis-progress');
+    const iv = setInterval(() => {
+      if (i < msgs.length - 1) { prog.textContent = msgs[i++]; }
+      else {
+        clearInterval(iv);
+        // Compute scores from inputs
+        const bmi = height && weight ? +(weight / ((height / 100) ** 2)).toFixed(1) : 0;
+        const obesityRisk   = Math.min(100, Math.round((bmi > 25 ? (bmi - 25) * 8 : 0) + (junk === 'Daily' ? 20 : junk === '3–4x/week' ? 10 : 0)));
+        const hyperRisk     = Math.min(100, Math.round((bp.includes('High') ? 40 : bp.includes('Elevated') ? 20 : 10) + (stress > 6 ? (stress - 6) * 4 : 0)));
+        const stressRisk    = Math.min(100, Math.round(stress * 8 + (sleep < 6 ? (6 - sleep) * 5 : 0) + (screen > 8 ? (screen - 8) * 2 : 0)));
+        const lifestyleRisk = Math.min(100, Math.round((obesityRisk + stressRisk) / 2 + (walk < 20 ? 10 : 0)));
+        const overall       = Math.round((obesityRisk + hyperRisk + stressRisk + lifestyleRisk) / 4);
+        const healthScore   = Math.max(0, 100 - overall);
+        const confidence    = Math.round(72 + Math.random() * 18);
 
-    $('heartChartWrap').innerHTML = '<canvas id="heartChart"></canvas>';
-    const ctx  = $('heartChart').getContext('2d');
-    const grad = ctx.createLinearGradient(0,0,0,180);
-    grad.addColorStop(0,'rgba(232,168,53,0.3)');
-    grad.addColorStop(1,'rgba(232,168,53,0.01)');
+        assessmentData = { name, age, height, weight, bmi, sleep, stress, water, screen, walk, junk, bp, hr,
+          scores: { overall, obesityRisk, hyperRisk, stressRisk, lifestyleRisk, healthScore, confidence } };
 
-    mkChart('heartChart',{
+        setTimeout(() => {
+          modal.classList.remove('active');
+          applyAssessmentResults(assessmentData);
+          navTo('dash-results', document.querySelectorAll('.nav-item')[2]);
+        }, 500);
+      }
+    }, 500);
+  }
+
+  function applyAssessmentResults(data) {
+    const s = data.scores;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+
+    // ── OVERVIEW ──
+    document.getElementById('overview-empty').style.display = 'none';
+    document.getElementById('overview-data').style.display = 'block';
+
+    const bmi = data.bmi || (data.height && data.weight ? +(data.weight / ((data.height/100)**2)).toFixed(1) : 0);
+    const bmiCat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+    const stressLabel = s.stressRisk > 70 ? 'High' : s.stressRisk > 40 ? 'Moderate' : 'Low';
+    const stressColor = s.stressRisk > 70 ? 'var(--red)' : s.stressRisk > 40 ? 'var(--amber)' : 'var(--green)';
+
+    document.getElementById('ov-health').innerHTML = `${s.healthScore}<span style="font-size:18px;color:var(--text-muted)">/100</span>`;
+    document.getElementById('ov-health-change').textContent = 'First assessment';
+    document.getElementById('ov-risk').textContent = s.overall;
+    document.getElementById('ov-risk').style.color = s.overall > 60 ? 'var(--red)' : s.overall > 35 ? 'var(--amber)' : 'var(--green)';
+    document.getElementById('ov-risk-change').textContent = s.overall > 60 ? '↑ High risk zone' : s.overall > 35 ? '↑ Moderate risk zone' : '↓ Low risk zone';
+    document.getElementById('ov-sleep').innerHTML = `${parseFloat(data.sleep).toFixed(1)}<span style="font-size:14px;color:var(--text-muted)">hrs</span>`;
+    document.getElementById('ov-water').innerHTML = `${parseFloat(data.water).toFixed(1)}<span style="font-size:14px;color:var(--text-muted)">L</span>`;
+    document.getElementById('ov-stress').textContent = stressLabel;
+    document.getElementById('ov-stress').style.color = stressColor;
+    document.getElementById('ov-stress-sub').textContent = `Score: ${s.stressRisk}/100`;
+    document.getElementById('ov-bmi').textContent = bmi;
+    document.getElementById('ov-bmi').style.color = bmi >= 30 ? 'var(--red)' : bmi >= 25 ? 'var(--amber)' : 'var(--green)';
+    document.getElementById('ov-bmi-cat').textContent = bmiCat;
+
+    // Risk breakdown badges
+    const rb = (score) => score > 60 ? ['High','badge badge-red'] : score > 35 ? ['Moderate','badge badge-amber'] : ['Low','badge badge-green'];
+    const [obL, obC] = rb(s.obesityRisk);   setEl('rb-obesity', obL, obC);
+    const [hyL, hyC] = rb(s.hyperRisk);     setEl('rb-hyper', hyL, hyC);
+    const [liL, liC] = rb(s.lifestyleRisk); setEl('rb-lifestyle', liL, liC);
+    const [stL, stC] = rb(s.stressRisk);    setEl('rb-burnout', stL, stC);
+
+    // AI Insights
+    document.getElementById('ov-insights').innerHTML = buildInsights(data, s);
+
+    // Timeline
+    document.getElementById('ov-timeline').innerHTML = buildTimeline(data, dateStr);
+
+    // ── RESULTS ──
+    document.getElementById('results-empty').style.display = 'none';
+    document.getElementById('results-data').style.display = 'block';
+    document.getElementById('result-date').textContent = `AI-generated · ${data.name || 'User'} · ${dateStr}`;
+    document.getElementById('btn-export-pdf').style.opacity = '1';
+    document.getElementById('btn-export-pdf').style.pointerEvents = 'auto';
+    document.getElementById('btn-export-plan').style.opacity = '1';
+    document.getElementById('btn-export-plan').style.pointerEvents = 'auto';
+
+    function setScore(scoreId, badgeId, barId, score, color) {
+      document.getElementById(scoreId).textContent = score;
+      document.getElementById(scoreId).style.color = color;
+      document.getElementById(barId).style.width = score + '%';
+      document.getElementById(barId).style.background = color;
+      const [l, c] = rb(score);
+      setEl(badgeId, l, c);
+    }
+    const riskColor = (s) => s > 60 ? 'var(--red)' : s > 35 ? 'var(--amber)' : 'var(--green)';
+    setScore('r-overall-score','r-overall-badge','r-overall-bar', s.overall, riskColor(s.overall));
+    setScore('r-obesity-score','r-obesity-badge','r-obesity-bar', s.obesityRisk, riskColor(s.obesityRisk));
+    setScore('r-hyper-score','r-hyper-badge','r-hyper-bar', s.hyperRisk, riskColor(s.hyperRisk));
+    setScore('r-stress-score','r-stress-badge','r-stress-bar', s.stressRisk, riskColor(s.stressRisk));
+    setEl('r-lifestyle-badge', rb(s.lifestyleRisk)[0], rb(s.lifestyleRisk)[1]);
+    document.getElementById('r-lifestyle-score').textContent = s.lifestyleRisk;
+    document.getElementById('r-lifestyle-score').style.color = riskColor(s.lifestyleRisk);
+    document.getElementById('r-bmi-label').textContent = `BMI ${bmi}`;
+    document.getElementById('r-stress-label').textContent = s.stressRisk > 70 ? 'Critical' : s.stressRisk > 40 ? 'Elevated' : 'Managed';
+
+    // Confidence ring
+    const conf = s.confidence;
+    const circ = 289;
+    document.getElementById('conf-ring').setAttribute('stroke-dashoffset', (circ - (circ * conf / 100)).toFixed(1));
+    document.getElementById('conf-pct').textContent = conf + '%';
+
+    // Param table
+    const tbody = document.getElementById('param-tbody');
+    const sleepStatus = data.sleep >= 7 ? ['Normal','badge badge-green',15] : data.sleep >= 6 ? ['Low','badge badge-amber',50] : ['Deficient','badge badge-red',80];
+    const hrStatus = (!data.hr || (data.hr >= 60 && data.hr <= 100)) ? ['Normal','badge badge-green',15] : ['Abnormal','badge badge-amber',60];
+    const bmiStatus = bmi < 25 ? ['Normal','badge badge-green',15] : bmi < 30 ? ['Overweight','badge badge-amber',55] : ['Obese','badge badge-red',85];
+    const junkFreq = data.junk || '—';
+    const junkStatus = ['Never','1–2x/week'].includes(junkFreq) ? ['Acceptable','badge badge-green',10] : junkFreq === '3–4x/week' ? ['Frequent','badge badge-amber',55] : ['Excessive','badge badge-red',80];
+
+    tbody.innerHTML = `
+      <tr><td class="fw-700">BMI</td><td>${bmi}</td><td>18.5–24.9</td><td><span class="${bmiStatus[1]}">${bmiStatus[0]}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${bmiStatus[2]}%;background:${bmi<25?'var(--green)':bmi<30?'var(--amber)':'var(--red)'}"></div></div></td></tr>
+      <tr><td class="fw-700">Sleep Duration</td><td>${data.sleep} hrs</td><td>7–9 hrs</td><td><span class="${sleepStatus[1]}">${sleepStatus[0]}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${sleepStatus[2]}%;background:${data.sleep>=7?'var(--green)':data.sleep>=6?'var(--amber)':'var(--red)'}"></div></div></td></tr>
+      <tr><td class="fw-700">Stress Level</td><td>${data.stress}/10</td><td>≤4/10</td><td><span class="${data.stress>6?'badge badge-red':data.stress>4?'badge badge-amber':'badge badge-green'}">${data.stress>6?'High':data.stress>4?'Moderate':'Low'}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${data.stress*9}%;background:${data.stress>6?'var(--red)':data.stress>4?'var(--amber)':'var(--green)'}"></div></div></td></tr>
+      <tr><td class="fw-700">Water Intake</td><td>${parseFloat(data.water).toFixed(1)} L</td><td>2.5–3.5 L</td><td><span class="${data.water>=2.5?'badge badge-green':data.water>=1.5?'badge badge-amber':'badge badge-red'}">${data.water>=2.5?'Optimal':data.water>=1.5?'Low':'Very Low'}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${Math.max(5,Math.round((3-data.water)*25))}%;background:${data.water>=2.5?'var(--green)':'var(--amber)'}"></div></div></td></tr>
+      <tr><td class="fw-700">Junk Food</td><td>${junkFreq}</td><td>≤1–2x/week</td><td><span class="${junkStatus[1]}">${junkStatus[0]}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${junkStatus[2]}%;background:${junkFreq==='Never'||junkFreq==='1–2x/week'?'var(--green)':junkFreq==='3–4x/week'?'var(--amber)':'var(--red)'}"></div></div></td></tr>
+      <tr><td class="fw-700">Daily Walk</td><td>${data.walk} min</td><td>≥30 min</td><td><span class="${data.walk>=30?'badge badge-green':data.walk>=15?'badge badge-amber':'badge badge-red'}">${data.walk>=30?'Adequate':data.walk>=15?'Moderate':'Low'}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${Math.max(5,40-data.walk)}%;background:${data.walk>=30?'var(--green)':'var(--amber)'}"></div></div></td></tr>
+      ${data.hr ? `<tr><td class="fw-700">Heart Rate</td><td>${data.hr} bpm</td><td>60–100 bpm</td><td><span class="${hrStatus[1]}">${hrStatus[0]}</span></td><td><div class="risk-bar-wrap" style="width:80px"><div class="risk-bar" style="width:${hrStatus[2]}%;background:${data.hr>=60&&data.hr<=100?'var(--green)':'var(--amber)'}"></div></div></td></tr>` : ''}
+    `;
+
+    // ── RECS ──
+    document.getElementById('rec-empty').style.display = 'none';
+    document.getElementById('rec-data').style.display = 'block';
+
+    // ── CONSULT badge ──
+    document.getElementById('report-ready-badge').style.display = 'flex';
+    document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' · Last updated just now';
+
+    // Re-init charts after data is populated
+    setTimeout(initAllCharts, 80);
+  }
+
+  function setEl(id, text, cls) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = text; el.className = cls || el.className; }
+  }
+
+  function buildInsights(data, s) {
+    const items = [];
+    if (s.stressRisk > 50) items.push({ icon:'🧠', bg:'var(--red-soft)', col:'var(--red)', title:'Stress Pattern Detected', desc:`Stress score ${s.stressRisk}/100 with ${data.screen}hr screen time and ${data.sleep}hr sleep — high burnout risk.` });
+    if (data.junk === 'Daily' || data.junk === '3–4x/week') items.push({ icon:'🍛', bg:'var(--amber-soft)', col:'var(--amber)', title:'Diet Improvement Area', desc:'High junk food frequency detected. Switching to whole Indian foods can significantly reduce lifestyle risk.' });
+    if (data.walk >= 20) items.push({ icon:'🚶', bg:'var(--green-soft)', col:'var(--green)', title:'Activity Level — Active', desc:`${data.walk} min daily walk is a great start. Target 7,000 steps/day to shift your risk score below 35.` });
+    else items.push({ icon:'🚶', bg:'var(--amber-soft)', col:'var(--amber)', title:'Low Physical Activity', desc:'Minimal daily movement detected. A 20-min brisk walk post lunch can reduce risk score by up to 8 points.' });
+    if (data.water < 2) items.push({ icon:'💧', bg:'var(--teal-soft)', col:'var(--teal)', title:'Hydration Below Target', desc:`${parseFloat(data.water).toFixed(1)}L detected. Aim for 2.5L/day — dehydration amplifies fatigue and stress markers.` });
+    return items.map(it => `<div class="insight-item"><div class="insight-icon" style="background:${it.bg};color:${it.col}">${it.icon}</div><div><div class="insight-title">${it.title}</div><div class="insight-desc">${it.desc}</div></div></div>`).join('');
+  }
+
+  function buildTimeline(data, dateStr) {
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div><div class="timeline-title">Health Assessment Completed</div><div class="timeline-meta">Today · Score ${data.scores.healthScore}/100</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--accent)"></div><div><div class="timeline-title">AI Risk Report Generated</div><div class="timeline-meta">${dateStr} · 28 parameters analysed</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--purple)"></div><div><div class="timeline-title">Sleep Pattern Logged</div><div class="timeline-meta">Today · ${data.sleep} hrs recorded</div></div></div>
+      </div>
+      <div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--teal)"></div><div><div class="timeline-title">Hydration Recorded</div><div class="timeline-meta">Today · ${parseFloat(data.water).toFixed(1)}L logged</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Personalized Recommendations Ready</div><div class="timeline-meta">Today · India-specific plan generated</div></div></div>
+      </div>
+    </div>`;
+  }
+
+  // ── MODALS ──
+  function showModal(id) { document.getElementById(id)?.classList.add('active'); }
+  function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id);
+  });
+
+  function toggleTab(btn) {
+    btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  document.addEventListener('click', e => {
+    const item = e.target.closest('.checkbox-item');
+    if (item) {
+      item.classList.toggle('checked');
+      const cb = item.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = item.classList.contains('checked');
+    }
+  });
+
+  // ── CHARTS ──
+  const C = Chart.defaults;
+  C.color = '#b08a50'; C.font.family = 'DM Sans, sans-serif'; C.font.size = 11;
+
+  const EMPTY_DATA_MSG = { id:'no-data', afterDraw(chart) {
+    if (chart.data.datasets.every(d => d.data.every(v => v === 0 || v == null))) {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      ctx.save();
+      ctx.fillStyle = '#6b4e28'; ctx.font = '13px DM Sans, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('Complete an assessment to see data', (chartArea.left + chartArea.right) / 2, (chartArea.top + chartArea.bottom) / 2);
+      ctx.restore();
+    }
+  }};
+  Chart.register(EMPTY_DATA_MSG);
+
+  const CHART_OPTS = {
+    plugins: { legend:{ display:false }, tooltip:{ backgroundColor:'rgba(16,10,4,0.95)', borderColor:'rgba(255,255,255,0.08)', borderWidth:1, padding:10, cornerRadius:8, titleColor:'#f5ead8', bodyColor:'#b08a50' } },
+    scales: { x:{ grid:{ color:'rgba(255,255,255,0.04)', drawBorder:false }, ticks:{ color:'#6b4e28' } }, y:{ grid:{ color:'rgba(255,255,255,0.04)', drawBorder:false }, ticks:{ color:'#6b4e28' } } },
+    responsive:true, maintainAspectRatio:true
+  };
+  const NO_SCALE = { plugins:CHART_OPTS.plugins, responsive:true, maintainAspectRatio:true };
+
+  const charts = {};
+  function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+  function getScores() { return assessmentData ? assessmentData.scores : null; }
+
+  function initAllCharts() {
+    initOverviewCharts(); initResultsCharts(); initRecCharts();
+    chartsInitialized = true;
+  }
+  function reinitChartsForPage(pageId) {
+    const map = { 'dash-overview':initOverviewCharts, 'dash-results':initResultsCharts, 'dash-recommendations':initRecCharts };
+    if (map[pageId]) map[pageId]();
+  }
+
+  function initOverviewCharts() {
+    destroyChart('trend'); destroyChart('donut'); destroyChart('activity');
+    const s = getScores();
+
+    const ctx1 = document.getElementById('chart-trend');
+    if (ctx1) charts['trend'] = new Chart(ctx1, {
       type:'line',
-      data:{
-        labels: data.labels,
-        datasets:[{
-          data: data.heart,
-          borderColor:'#e8a835', borderWidth:2.5,
-          backgroundColor: grad,
-          tension:0.45, fill:true,
-          pointBackgroundColor:'#e8a835',
-          pointRadius:4, pointHoverRadius:6
-        }]
-      },
-      options: cloneCD({ maintainAspectRatio:false })
+      data:{ labels:['W1','W2','W3','W4','W5','W6','W7','Now'],
+        datasets:[
+          { label:'Health Score', data: s ? [0,0,0,0,0,0,0, s.healthScore] : [0,0,0,0,0,0,0,0], borderColor:'#e8a835', backgroundColor:'rgba(232,168,53,0.08)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 },
+          { label:'Stress Score', data: s ? [0,0,0,0,0,0,0, s.stressRisk]  : [0,0,0,0,0,0,0,0], borderColor:'#e07050', backgroundColor:'rgba(224,112,80,0.05)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 },
+          { label:'Sleep Score',  data: s ? [0,0,0,0,0,0,0, Math.round(assessmentData.sleep/9*100)] : [0,0,0,0,0,0,0,0], borderColor:'#a8cc6a', backgroundColor:'rgba(168,204,106,0.05)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 }
+        ]},
+      options:{...CHART_OPTS, plugins:{...CHART_OPTS.plugins, legend:{display:true,position:'top',labels:{color:'#b08a50',boxWidth:10,usePointStyle:true,font:{size:11}}}}}
     });
 
-  } catch(e){
-    $('heartChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">♡</span>Could not load heart rate data</div>';
-  }
-}
+    const ctx2 = document.getElementById('chart-risk-donut');
+    if (ctx2) charts['donut'] = new Chart(ctx2, {
+      type:'doughnut',
+      data:{ labels:['Obesity','Hypertension','Lifestyle','Burnout'],
+        datasets:[{ data: s ? [s.obesityRisk, s.hyperRisk, s.lifestyleRisk, s.stressRisk] : [0,0,0,0],
+          backgroundColor:['#f0c060','#a8cc6a','#f0c060','#e07050'], borderWidth:0 }]},
+      options:{...NO_SCALE, cutout:'72%'}
+    });
 
-// ── /api/records/summary → everything else ──────────────────────
-async function loadSummary(){
-  try {
-    const res  = await fetch('/api/records/summary');
-    const data = await res.json();
-    const entries = (data.entries || []).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-
-    if(!entries.length){
-      ['insightsList','vitalsList','goalsList'].forEach(id=>{
-        $(id).innerHTML = '<div class="no-data" style="height:140px"><span class="nd-icon">◈</span>No records yet — run your first assessment</div>';
-      });
-      $('sleepChartWrap').innerHTML = '<div class="no-data"><span class="nd-icon">◐</span>No sleep data yet</div>';
-      return;
-    }
-
-    const latest = entries[0];
-    const prev   = entries[1] || null;
-
-    // ── Insights ────────────────────────────────────────────────
-    buildInsights(latest, prev, entries);
-
-    // ── Vitals ──────────────────────────────────────────────────
-    buildVitals(latest);
-
-    // ── Goals ───────────────────────────────────────────────────
-    buildGoals(entries);
-
-    // ── Sleep chart ─────────────────────────────────────────────
-    buildSleepChart(entries);
-
-    // ── Update sleep stat card with real latest value ────────────
-    if(latest.sleep && parseFloat(latest.sleep) > 0){
-      const sl   = parseFloat(latest.sleep);
-      const slSt = sleepBadge(sl);
-      $('sc-sleep').innerHTML = `${sl.toFixed(1)}<span>hrs</span>`;
-      $('sc-sleep-sub').innerHTML = `<span class="${slSt.cls==='vb-good'?'trend-up':slSt.cls==='vb-warn'?'trend-warn':'trend-bad'}">● ${slSt.label}</span>`;
-    }
-
-  } catch(e){
-    console.error('Summary load failed:', e);
-  }
-}
-
-// ── Insights builder ────────────────────────────────────────────
-function buildInsights(latest, prev, all){
-  const ins = [];
-  const rc  = riskClass(latest.risk||'');
-
-  // Overall risk
-  if(rc==='low'){
-    ins.push({dot:'dot-green', text:'Overall cardiovascular risk is LOW',
-      sub:'Latest assessment shows a healthy profile · Keep it up'});
-  } else if(rc==='high'){
-    ins.push({dot:'dot-red', text:'Cardiovascular risk is flagged as HIGH',
-      sub:'Consult a physician · Lifestyle changes recommended'});
-  } else {
-    ins.push({dot:'dot-warn', text:'Moderate cardiovascular risk detected',
-      sub:'Monitor closely · Consider a lifestyle review'});
+    const ctx3 = document.getElementById('chart-activity');
+    if (ctx3) charts['activity'] = new Chart(ctx3, {
+      type:'bar',
+      data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets:[
+          { label:'Steps (00s)', data:[0,0,0,0,0,0,0], backgroundColor:'rgba(232,168,53,0.5)', borderRadius:4 },
+          { label:'Active Min',  data:[0,0,0,0,0,0,0], backgroundColor:'rgba(168,204,106,0.4)', borderRadius:4 }
+        ]},
+      options:{...CHART_OPTS, plugins:{...CHART_OPTS.plugins, legend:{display:true,position:'top',labels:{color:'#b08a50',boxWidth:10,usePointStyle:true,font:{size:11}}}}}
+    });
   }
 
-  // BP
-  const bp = parseFloat(latest.systolic_bp);
-  if(!isNaN(bp)){
-    if(bp < 120)      ins.push({dot:'dot-green', text:'Blood pressure is in the optimal range', sub:`${Math.round(bp)} mmHg · No intervention needed`});
-    else if(bp < 130) ins.push({dot:'dot-amber', text:'Blood pressure is normal but watch it',  sub:`${Math.round(bp)} mmHg · Stay active, reduce sodium`});
-    else              ins.push({dot:'dot-warn',  text:'Elevated blood pressure detected',        sub:`${Math.round(bp)} mmHg · Consider a lifestyle review`});
+  function initResultsCharts() {
+    destroyChart('importance');
+    const ctx = document.getElementById('chart-importance');
+    const s = getScores();
+    if (ctx) charts['importance'] = new Chart(ctx, {
+      type:'bar',
+      data:{ labels:['Stress Level','Junk Food','Sleep Hrs','Screen Time','BMI','Water Intake','Walking','BP','Exercise','Heart Rate'],
+        datasets:[{ data: s
+          ? [Math.round(s.stressRisk*0.22), Math.round(s.lifestyleRisk*0.18), Math.round(s.stressRisk*0.15),
+             Math.round(s.stressRisk*0.12), Math.round(s.obesityRisk*0.11), 8, 6, 4, 3, 1]
+          : [0,0,0,0,0,0,0,0,0,0],
+          backgroundColor:s ? ['#e07050','#e07050','#f0c060','#f0c060','#f0c060','#e8a835','#e8a835','#a8cc6a','#a8cc6a','#a8cc6a'] : Array(10).fill('rgba(255,255,255,0.08)'),
+          borderRadius:4 }]},
+      options:{...CHART_OPTS, indexAxis:'y', scales:{ x:{...CHART_OPTS.scales.x, max:25}, y:{grid:{display:false},ticks:{color:'#b08a50',font:{size:11}}}}}
+    });
   }
 
-  // Sleep
-  const sl = parseFloat(latest.sleep);
-  if(!isNaN(sl)){
-    if(sl >= 7 && sl <= 9)
-      ins.push({dot:'dot-green', text:`Sleep at ${sl.toFixed(1)}h is within optimal range`, sub:'7–9 hours recommended · Maintain your schedule'});
-    else
-      ins.push({dot:'dot-warn',  text:`Sleep of ${sl.toFixed(1)}h is below target`, sub:'Aim for 7–9 hours · Consistency is key'});
+  function initRecCharts() {
+    destroyChart('projection');
+    const ctx = document.getElementById('chart-projection');
+    const s = getScores();
+    if (ctx) charts['projection'] = new Chart(ctx, {
+      type:'line',
+      data:{ labels:['Now','Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'],
+        datasets:[
+          { label:'Risk Score',   data: s ? [s.overall, ...Array.from({length:8},(_,i)=>Math.max(15,Math.round(s.overall - (i+1)*((s.overall-15)/8))))] : [0,0,0,0,0,0,0,0,0], borderColor:'#e8a835', backgroundColor:'rgba(232,168,53,0.08)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 },
+          { label:'Health Score', data: s ? [s.healthScore, ...Array.from({length:8},(_,i)=>Math.min(95,Math.round(s.healthScore + (i+1)*((90-s.healthScore)/8))))] : [0,0,0,0,0,0,0,0,0], borderColor:'#a8cc6a', backgroundColor:'rgba(168,204,106,0.06)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 }
+        ]},
+      options:{...CHART_OPTS, plugins:{...CHART_OPTS.plugins, legend:{display:true,position:'top',labels:{color:'#b08a50',boxWidth:10,usePointStyle:true,font:{size:11}}}}}
+    });
   }
 
-  // Steps
-  const st = parseFloat(latest.steps);
-  if(!isNaN(st)){
-    if(st >= 10000)
-      ins.push({dot:'dot-green', text:`${Math.round(st).toLocaleString()} steps — daily goal achieved!`, sub:'Great physical activity level'});
-    else
-      ins.push({dot:'dot-amber', text:`${Math.round(st).toLocaleString()} steps — below 10,000 target`, sub:`${(10000-Math.round(st)).toLocaleString()} more steps to reach goal`});
-  }
-
-  // Reasons from rule engine
-  if(latest.reason){
-    latest.reason.split(';').map(r=>r.trim()).filter(Boolean).slice(0,2)
-      .forEach(r => ins.push({dot:'dot-warn', text:r, sub:'Flagged by your assessment'}));
-  }
-
-  $('insightsList').innerHTML = ins.slice(0,5).map(i=>`
-    <div class="insight-item">
-      <span class="insight-dot ${i.dot}"></span>
-      <div>
-        <div class="insight-text">${i.text}</div>
-        <div class="insight-sub">${i.sub}</div>
-      </div>
-    </div>`).join('');
-}
-
-// ── Vitals builder ──────────────────────────────────────────────
-function buildVitals(r){
-  const bp   = parseFloat(r.systolic_bp);
-  const chol = parseFloat(r.chol);
-  const sl   = parseFloat(r.sleep);
-  const st   = parseFloat(r.steps);
-  const hr   = parseFloat(r.heart_rate);
-  const age  = parseFloat(r.age);
-
-  const rows = [
-    { label:'Blood Pressure', value: !isNaN(bp)   ? `${Math.round(bp)} mmHg`          : '—', ...bpBadge(!isNaN(bp)?bp:null) },
-    { label:'Cholesterol',    value: !isNaN(chol)  ? `${Math.round(chol)} mg/dL`       : '—', ...cholBadge(!isNaN(chol)?chol:null) },
-    { label:'Heart Rate',     value: !isNaN(hr)    ? `${Math.round(hr)} bpm`           : '—',
-      label2:'badge',
-      badge: !isNaN(hr) ? (hr>=60&&hr<=100?'Normal':hr<60?'Low':'High') : 'No data',
-      cls:   !isNaN(hr) ? (hr>=60&&hr<=100?'vb-good':'vb-warn') : 'vb-warn' },
-    { label:'Sleep',          value: !isNaN(sl)    ? `${sl.toFixed(1)} hrs`            : '—', ...sleepBadge(!isNaN(sl)?sl:null) },
-    { label:'Daily Steps',    value: !isNaN(st)    ? Math.round(st).toLocaleString()   : '—',
-      badge: !isNaN(st) ? (st>=10000?'Goal Met':'Below Target') : 'No data',
-      cls:   !isNaN(st) ? (st>=10000?'vb-good':'vb-warn') : 'vb-warn' },
-    { label:'Risk Level',     value: r.risk || '—',
-      badge: r.risk ? riskClass(r.risk).charAt(0).toUpperCase()+riskClass(r.risk).slice(1) : 'No data',
-      cls:   r.risk ? (riskClass(r.risk)==='low'?'vb-good':riskClass(r.risk)==='high'?'vb-bad':'vb-warn') : 'vb-warn' }
-  ];
-
-  $('vitalsList').innerHTML = rows.map(v=>`
-    <div class="vital-row">
-      <span class="vital-label">${v.label}</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="vital-val">${v.value}</span>
-        <span class="vital-badge ${v.cls}">${v.badge||v.label}</span>
-      </div>
-    </div>`).join('');
-}
-
-// ── Goals builder ───────────────────────────────────────────────
-function buildGoals(entries){
-  const cutoff  = Date.now() - 7*24*3600*1000;
-  const weekRec = entries.filter(r=>new Date(r.timestamp).getTime()>cutoff);
-  const use     = weekRec.length ? weekRec : entries.slice(0,5);
-  $('goalsSubtitle').textContent = `Based on ${use.length} record${use.length!==1?'s':''} this period`;
-
-  const avgSteps = numAvg(use,'steps');
-  const avgSleep = numAvg(use,'sleep');
-  const avgBP    = numAvg(use,'systolic_bp');
-  const avgChol  = numAvg(use,'chol');
-
-  const GOALS = [
-    { label:'Steps Daily Avg', val:avgSteps, target:10000,
-      fmt:v=>Math.round(v).toLocaleString(), unit:'',
-      pct: avgSteps ? Math.min(100,avgSteps/10000*100) : 0,
-      color:'linear-gradient(90deg,var(--amber),var(--terracotta))' },
-    { label:'Sleep Goal', val:avgSleep, target:8,
-      fmt:v=>v.toFixed(1), unit:'h',
-      pct: avgSleep ? Math.min(100,avgSleep/8*100) : 0,
-      color:'linear-gradient(90deg,var(--sage),#5c8a50)' },
-    { label:'BP Target', val:avgBP, target:120,
-      fmt:v=>Math.round(v), unit:'',
-      pct: avgBP ? Math.min(100, Math.max(0, (140-avgBP)/20*100)) : 0,
-      color:'linear-gradient(90deg,#c8a035,var(--amber))' },
-    { label:'Cholesterol', val:avgChol, target:200,
-      fmt:v=>Math.round(v), unit:'mg/dL',
-      pct: avgChol ? Math.min(100, Math.max(0, (240-avgChol)/40*100)) : 0,
-      color:'linear-gradient(90deg,#6e8db4,#8aabcc)' }
-  ];
-
-  $('goalsList').innerHTML = GOALS.map(g=>`
-    <div class="progress-item">
-      <div class="progress-header">
-        <span class="progress-label">${g.label}</span>
-        <span class="progress-val">${g.val!=null ? g.fmt(g.val)+g.unit : '—'} / ${g.fmt(g.target)}${g.unit}</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width:${g.pct.toFixed(1)}%;background:${g.color}"></div>
-      </div>
-    </div>`).join('');
-}
-
-// ── Sleep chart builder ─────────────────────────────────────────
-function buildSleepChart(entries){
-  const rev    = [...entries].reverse();
-  const labels = rev.map((r,i)=>{
-    const d = new Date(r.timestamp);
-    return isNaN(d) ? `#${i+1}` : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+  window.addEventListener('load', () => {
+    syncAllSliders();
+    calcBMI();
   });
-  const sleepData = rev.map(r=>parseFloat(r.sleep)||0);
-
-  $('sleepSubtitle').textContent = `${entries.length} assessment${entries.length!==1?'s':''}`;
-  $('sleepChartWrap').innerHTML  = '<canvas id="sleepChart"></canvas>';
-
-  const ctx  = $('sleepChart').getContext('2d');
-  const grad = ctx.createLinearGradient(0,0,0,180);
-  grad.addColorStop(0,'rgba(122,158,110,0.4)');
-  grad.addColorStop(1,'rgba(122,158,110,0.01)');
-
-  mkChart('sleepChart',{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{
-        data: sleepData,
-        backgroundColor: sleepData.map(v=>v>=7?'rgba(122,158,110,0.7)':'rgba(122,158,110,0.35)'),
-        borderColor:'rgba(122,158,110,0.8)', borderWidth:1,
-        borderRadius:6, borderSkipped:false
-      }]
-    },
-    options: cloneCD({
-      maintainAspectRatio:false,
-      scales:{ ...JSON.parse(JSON.stringify(CD.scales)),
-        y:{ ...JSON.parse(JSON.stringify(CD.scales.y)), min:0, max:12 }
-      }
-    })
-  });
-}
-
-// ── Boot ────────────────────────────────────────────────────────
-loadHeartChart();
-loadSummary();
-
-// Auto-refresh every 60 s to pick up new assessments
-setInterval(()=>{ loadHeartChart(); loadSummary(); }, 60000);
 </script>
 </body>
 </html>

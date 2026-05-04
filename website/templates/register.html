@@ -1,468 +1,723 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYRIX • Create Account</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:          #1a1208;
-      --panel:       #211a0e;
-      --card:        #2a2010;
-      --card-alt:    #241c0c;
-      --amber:       #e8a835;
-      --amber-soft:  #e8a83522;
-      --amber-glow:  #e8a83540;
-      --terracotta:  #c8613a;
-      --terra-soft:  #c8613a22;
-      --sage:        #7a9e6e;
-      --sage-soft:   #7a9e6e1a;
-      --cream:       #f0e6cc;
-      --text:        #ede4cf;
-      --muted:       #a09070;
-      --border:      rgba(232,168,53,0.12);
-      --border-warm: rgba(232,168,53,0.25);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYRIX — Create Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #100a04;
+    --bg2: #16100a;
+    --border: rgba(232,168,53,0.10);
+    --border-hover: rgba(232,168,53,0.25);
+    --border-focus: rgba(232,168,53,0.45);
+    --text: #f5ead8;
+    --text2: #b08a50;
+    --muted: #6b4e28;
+    --accent: #e8a835;
+    --accent2: #c8613a;
+    --accent-soft: rgba(232,168,53,0.10);
+    --red: #e07050;
+    --red-soft: rgba(224,112,80,0.10);
+    --green: #a8cc6a;
+    --green-soft: rgba(168,204,106,0.10);
+    --amber: #f0c060;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font: 'DM Sans', sans-serif;
+    --font-display: 'Syne', sans-serif;
+    --shadow: 0 8px 40px rgba(0,0,0,0.6);
+    --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-x: hidden;
+    padding: 40px 20px 60px;
+  }
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  .bg-ambient {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 20%, rgba(232,168,53,0.07) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 45% at 85% 80%, rgba(200,97,58,0.05) 0%, transparent 60%);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(232,168,53,0.020) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,168,53,0.020) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%);
+  }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      display: flex; align-items: center; justify-content: center;
-      background-image:
-        radial-gradient(ellipse 70% 60% at 85% 10%, rgba(200,97,58,0.07) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 70% at 15% 90%, rgba(232,168,53,0.06) 0%, transparent 55%);
-      overflow: hidden;
-    }
+  .wrapper {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 520px;
+    animation: pageIn 0.55s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
 
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(232,168,53,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(232,168,53,0.03) 1px, transparent 1px);
-      background-size: 48px 48px; pointer-events: none;
-    }
+  /* ── LOGO ── */
+  .logo-wrap {
+    text-align: center; margin-bottom: 28px;
+  }
+  .logo-hex {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 46px; height: 46px; margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    font-size: 20px;
+  }
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    color: var(--text); display: block; margin-bottom: 4px;
+  }
+  .logo-tagline { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
 
-    .orb {
-      position: fixed; border-radius: 50%;
-      filter: blur(80px); pointer-events: none;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-    .orb-1 {
-      width: 340px; height: 340px;
-      background: radial-gradient(circle, rgba(200,97,58,0.08), transparent 70%);
-      top: -80px; right: -60px;
-    }
-    .orb-2 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(232,168,53,0.07), transparent 70%);
-      bottom: -80px; left: -60px; animation-delay: -6s;
-    }
-    @keyframes drift {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(20px,30px) scale(1.05); }
-    }
+  /* ── CARD ── */
+  .card {
+    background: rgba(22,16,10,0.88);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    backdrop-filter: blur(24px);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(232,168,53,0.05);
+    position: relative;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,168,53,0.3), transparent);
+    border-radius: 20px 20px 0 0;
+  }
 
-    .wrapper {
-      display: flex; width: 100%; max-width: 920px;
-      margin: 24px; border-radius: 24px; overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,168,53,0.04) inset;
-      animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  .card-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+  .card-sub { font-size: 13px; color: var(--text2); margin-bottom: 26px; }
 
-    /* ── Left panel ── */
-    .left-panel {
-      width: 340px; flex-shrink: 0;
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      padding: 48px 40px;
-      display: flex; flex-direction: column;
-      justify-content: space-between;
-      position: relative; overflow: hidden;
-    }
-    .left-panel::before {
-      content: ''; position: absolute;
-      bottom: -60px; right: -60px;
-      width: 220px; height: 220px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(200,97,58,0.09), transparent 70%);
-      pointer-events: none;
-    }
+  /* ── ROLE SELECTOR ── */
+  .role-label {
+    font-size: 11px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px;
+    display: block;
+  }
+  .role-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 24px;
+  }
+  .role-card {
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer; transition: var(--transition);
+    font-size: 12px; font-weight: 600;
+    text-align: center; color: var(--text2);
+    background: rgba(255,255,255,0.02);
+    user-select: none;
+  }
+  .role-card:hover { border-color: var(--border-hover); color: var(--text); }
+  .role-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft); color: var(--accent);
+  }
 
-    .brand .logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 30px; font-weight: 800;
-      letter-spacing: 5px; color: var(--amber);
-      display: block; margin-bottom: 4px;
-    }
-    .brand .logo-sub {
-      font-size: 9px; letter-spacing: 2.5px;
-      text-transform: uppercase; color: var(--muted);
-    }
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--text2); margin-bottom: 7px;
+    letter-spacing: 0.07em; text-transform: uppercase;
+  }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; opacity: 0.35; pointer-events: none;
+    transition: var(--transition);
+  }
+  .form-input, .form-select {
+    width: 100%; padding: 12px 13px 12px 40px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-family: var(--font); font-size: 14px;
+    transition: var(--transition); outline: none; -webkit-appearance: none;
+  }
+  .form-select { padding-left: 13px; cursor: pointer; }
+  .form-input::placeholder { color: var(--muted); }
+  .form-input:focus, .form-select:focus {
+    border-color: var(--border-focus);
+    background: rgba(232,168,53,0.04);
+    box-shadow: 0 0 0 3px rgba(232,168,53,0.07);
+  }
+  .form-input.error { border-color: rgba(224,112,80,0.5); background: var(--red-soft); }
+  .form-select option { background: #1a1208; color: var(--text); }
 
-    .left-info { margin-top: 48px; flex: 1; }
-    .left-info h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 21px; font-weight: 700;
-      color: var(--cream); line-height: 1.35; margin-bottom: 12px;
-    }
-    .left-info p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .input-wrap:focus-within .input-icon { opacity: 0.75; }
 
-    .steps { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
-    .step { display: flex; align-items: flex-start; gap: 14px; }
-    .step-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      border: 1px solid var(--border-warm);
-      background: var(--amber-soft); color: var(--amber);
-      font-family: 'Syne', sans-serif;
-      font-size: 11px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-    }
-    .step-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .step-text strong {
-      display: block; color: var(--text);
-      font-weight: 500; margin-bottom: 2px; font-size: 13.5px;
-    }
+  /* Password toggle */
+  .pwd-toggle {
+    position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    font-size: 14px; color: var(--muted); padding: 4px;
+    transition: var(--transition);
+  }
+  .pwd-toggle:hover { color: var(--text2); }
 
-    .back-link {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12.5px; color: var(--muted);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .back-link:hover { color: var(--amber); }
+  /* Password strength */
+  .pwd-strength-wrap { margin-top: 8px; }
+  .pwd-strength-bar {
+    display: flex; gap: 4px; margin-bottom: 5px;
+  }
+  .strength-seg {
+    flex: 1; height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    transition: background 0.4s ease;
+  }
+  .pwd-strength-label { font-size: 11px; color: var(--muted); }
 
-    /* ── Right panel ── */
-    .right-panel {
-      flex: 1; background: var(--card);
-      padding: 44px 48px;
-      display: flex; flex-direction: column; justify-content: center;
-      overflow-y: auto;
-    }
+  .field-error {
+    font-size: 11px; color: var(--red); margin-top: 5px;
+    display: none; padding-left: 2px;
+  }
+  .field-error.show { display: block; animation: alertIn 0.2s ease; }
+  @keyframes alertIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
 
-    .form-head { margin-bottom: 26px; }
-    .form-head h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 26px; font-weight: 700;
-      color: var(--cream); margin-bottom: 6px;
-    }
-    .form-head p { font-size: 13px; color: var(--muted); }
+  /* ── SECTION DIVIDER ── */
+  .section-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 22px 0 18px; font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .section-divider::before, .section-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
 
-    /* ── Two-col row ── */
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+  /* ── T&C ── */
+  .terms-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 22px; cursor: pointer;
+  }
+  .checkbox-box {
+    width: 17px; height: 17px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; transition: var(--transition);
+  }
+  .terms-row input { display: none; }
+  .terms-row input:checked + .checkbox-box {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+  .terms-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .link { color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; }
+  .link:hover { text-decoration: underline; }
 
-    /* ── Fields ── */
-    .field { margin-bottom: 16px; }
-    .field label {
-      display: block; font-size: 11px;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 7px;
-    }
+  /* ── BUTTON ── */
+  .btn-primary {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    border: none; border-radius: var(--radius-sm);
+    color: #fff; font-family: var(--font);
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: var(--transition);
+    letter-spacing: 0.02em; position: relative; overflow: hidden;
+  }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,168,53,0.35); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-content { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-spinner { display: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-    .input-wrap { position: relative; }
-    .input-wrap .icon {
-      position: absolute; left: 14px; top: 50%;
-      transform: translateY(-50%);
-      font-size: 14px; color: var(--muted);
-      pointer-events: none; opacity: 0.6;
-    }
-    .input-wrap input {
-      width: 100%;
-      padding: 12px 16px 12px 40px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px; color: var(--cream);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px; outline: none; transition: all 0.2s;
-    }
-    .input-wrap input::placeholder { color: rgba(160,144,112,0.5); }
-    .input-wrap input:focus {
-      border-color: var(--border-warm);
-      background: rgba(33,26,14,0.9);
-      box-shadow: 0 0 0 3px rgba(232,168,53,0.08);
-    }
-    .input-wrap input.valid   { border-color: rgba(122,158,110,0.4); }
-    .input-wrap input.invalid { border-color: rgba(200,97,58,0.45); }
+  /* ── ALERTS ── */
+  .alert {
+    display: none; align-items: flex-start; gap: 10px;
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; margin-bottom: 18px; border: 1px solid;
+    animation: alertIn 0.3s ease;
+  }
+  .alert.show { display: flex; }
+  .alert-error { background: var(--red-soft); border-color: rgba(224,112,80,0.3); color: var(--red); }
+  .alert-success { background: var(--green-soft); border-color: rgba(168,204,106,0.3); color: var(--green); }
+  .alert-text { color: var(--text); }
 
-    /* username hint */
-    .field-hint {
-      font-size: 11px; color: var(--muted);
-      margin-top: 5px; transition: color 0.2s;
-    }
-    .field-hint.ok   { color: var(--sage); }
-    .field-hint.warn { color: #d4843a; }
+  /* ── PASSWORD MATCH ── */
+  .match-indicator {
+    font-size: 11px; margin-top: 5px; padding-left: 2px;
+    display: none;
+  }
+  .match-indicator.ok { display: block; color: var(--green); }
+  .match-indicator.no { display: block; color: var(--red); }
 
-    /* eye toggle */
-    .eye-btn {
-      position: absolute; right: 13px; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none;
-      color: var(--muted); cursor: pointer;
-      font-size: 15px; opacity: 0.6; transition: opacity 0.2s; padding: 0;
-    }
-    .eye-btn:hover { opacity: 1; }
+  .card-footer {
+    text-align: center; margin-top: 22px;
+    font-size: 13px; color: var(--text2);
+  }
+  .security-note {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 22px; font-size: 11px; color: var(--muted);
+  }
+  .security-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: secPulse 2s infinite; }
+  @keyframes secPulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
-    /* ── Password strength ── */
-    .strength-wrap {
-      margin-top: 7px; display: flex; align-items: center; gap: 10px;
-    }
-    .strength-bars { display: flex; gap: 4px; flex: 1; }
-    .strength-bar {
-      height: 3px; flex: 1; border-radius: 999px;
-      background: rgba(255,255,255,0.07); transition: background 0.3s;
-    }
-    .strength-label {
-      font-size: 11px; color: var(--muted);
-      min-width: 44px; text-align: right; transition: color 0.3s;
-    }
-
-    /* ── Terms ── */
-    .terms-row {
-      display: flex; align-items: flex-start; gap: 10px;
-      margin-bottom: 20px; margin-top: 2px;
-    }
-    .terms-row input[type="checkbox"] {
-      width: 15px; height: 15px;
-      accent-color: var(--amber); cursor: pointer;
-      margin-top: 2px; flex-shrink: 0;
-    }
-    .terms-row label { font-size: 12.5px; color: var(--muted); line-height: 1.55; cursor: pointer; }
-    .terms-row label a { color: var(--amber); text-decoration: none; opacity: 0.9; }
-    .terms-row label a:hover { opacity: 1; }
-
-    /* ── Submit ── */
-    .submit-btn {
-      width: 100%; padding: 14px; border: none; border-radius: 12px;
-      background: linear-gradient(135deg, var(--amber) 0%, var(--terracotta) 100%);
-      color: #1a0e00; font-family: 'DM Sans', sans-serif;
-      font-size: 15px; font-weight: 600; cursor: pointer;
-      letter-spacing: 0.3px; transition: all 0.2s;
-      position: relative; overflow: hidden;
-    }
-    .submit-btn::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,168,53,0.28); }
-    .submit-btn:hover::after { opacity: 1; }
-    .submit-btn:active { transform: scale(0.98); }
-
-    .divider {
-      display: flex; align-items: center; gap: 14px;
-      margin: 18px 0; color: var(--muted);
-      font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    .login-row { text-align: center; font-size: 13px; color: var(--muted); }
-    .login-row a {
-      color: var(--amber); text-decoration: none;
-      font-weight: 500; margin-left: 4px; transition: opacity 0.2s;
-    }
-    .login-row a:hover { opacity: 0.8; }
-
-    @media (max-width: 780px) {
-      .left-panel { display: none; }
-      .wrapper { max-width: 480px; margin: 16px; }
-      .right-panel { padding: 40px 32px; }
-      .field-row { grid-template-columns: 1fr; gap: 0; }
-    }
-    @media (max-width: 420px) { .right-panel { padding: 32px 20px; } }
-  </style>
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(232,168,53,0.15); border-radius: 2px; }
+</style>
 </head>
 <body>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
+<div class="bg-ambient"></div>
+<div class="bg-grid"></div>
 
 <div class="wrapper">
 
-  <!-- ═══ LEFT PANEL ═══ -->
-  <div class="left-panel">
-    <div>
-      <div class="brand">
-        <span class="logo">CYRIX</span>
-        <span class="logo-sub">Health Intelligence</span>
-      </div>
-      <div class="left-info">
-        <h2>Start your health<br>intelligence journey.</h2>
-        <p>Create your account to access personalized cardiac risk monitoring and AI-powered health insights.</p>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-text">
-              <strong>Create your account</strong>
-              Set up your secure CYRIX profile
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-text">
-              <strong>Enter your vitals</strong>
-              Run your first cardiac risk assessment
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-text">
-              <strong>Track over time</strong>
-              Monitor trends and get AI-driven insights
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <a href="/" class="back-link">← Back to sign in</a>
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-hex">⬡</div>
+    <span class="logo-name">CYRIX</span>
+    <div class="logo-tagline">AI-Powered Lifestyle Health Intelligence</div>
   </div>
 
-  <!-- ═══ RIGHT PANEL ═══ -->
-  <div class="right-panel">
-    <div class="form-head">
-      <h1>Create account</h1>
-      <p>Fill in your details to get started with CYRIX</p>
+  <!-- CARD -->
+  <div class="card">
+    <div class="card-title">Create your account</div>
+    <div class="card-sub">Join CYRIX and start your health intelligence journey</div>
+
+    <!-- Alerts -->
+    <div class="alert alert-error" id="alert-error">
+      <span>⚠</span>
+      <span class="alert-text" id="alert-msg">Registration failed. Please check your details.</span>
+    </div>
+    <div class="alert alert-success" id="alert-success">
+      <span>✓</span>
+      <span class="alert-text" id="alert-success-msg">Account created! Redirecting to your dashboard...</span>
     </div>
 
-    <form action="/register" method="POST" novalidate>
-
-      <!-- Full name + Username side by side -->
-      <div class="field-row">
-        <div class="field">
-          <label for="name">Full name</label>
-          <div class="input-wrap">
-            <span class="icon">👤</span>
-            <input id="name" name="name" type="text"
-              placeholder="John Doe" required autocomplete="name">
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="username">Username</label>
-          <div class="input-wrap">
-            <span class="icon">◎</span>
-            <input id="username" name="username" type="text"
-              placeholder="john_doe" required autocomplete="username"
-              maxlength="24" oninput="validateUsername(this.value)">
-          </div>
-          <div class="field-hint" id="usernameHint">3–24 chars · letters, numbers, _</div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="email">Email address</label>
-        <div class="input-wrap">
-          <span class="icon">✉</span>
-          <input id="email" name="email" type="email"
-            placeholder="you@example.com" required autocomplete="email">
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="password">Password</label>
-        <div class="input-wrap">
-          <span class="icon">🔒</span>
-          <input id="password" name="password" type="password"
-            placeholder="••••••••" required autocomplete="new-password"
-            minlength="8" oninput="updateStrength(this.value)">
-          <button type="button" class="eye-btn" onclick="togglePwd()" id="eyeBtn" title="Show password">👁</button>
-        </div>
-        <div class="strength-wrap">
-          <div class="strength-bars">
-            <div class="strength-bar" id="s1"></div>
-            <div class="strength-bar" id="s2"></div>
-            <div class="strength-bar" id="s3"></div>
-            <div class="strength-bar" id="s4"></div>
-          </div>
-          <span class="strength-label" id="strengthLabel">—</span>
-        </div>
-      </div>
-
-      <div class="terms-row">
-        <input type="checkbox" id="terms" required>
-        <label for="terms">
-          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. Health data is stored securely and never shared.
-        </label>
-      </div>
-
-      <button type="submit" class="submit-btn">Create Account →</button>
-
-    </form>
-
-    <div class="divider">or</div>
-
-    <div class="login-row">
-      Already have an account?
-      <a href="/">Sign in →</a>
+    <!-- ROLE SELECTION -->
+    <span class="role-label">Select your role</span>
+    <div class="role-grid" id="role-grid">
+      <div class="role-card selected" data-role="user" onclick="selectRole(this)">👤 Individual User</div>
+      <div class="role-card" data-role="diet" onclick="selectRole(this)">🥗 Diet Expert</div>
+      <div class="role-card" data-role="fitness" onclick="selectRole(this)">🏋️ Fitness Coach</div>
+      <div class="role-card" data-role="corporate" onclick="selectRole(this)">🏢 Corporate HR</div>
     </div>
+
+    <!-- PERSONAL INFO -->
+    <div class="section-divider">Personal Information</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="fname">First Name</label>
+        <div class="input-wrap">
+          <input class="form-input" type="text" id="fname" placeholder="Arjun" autocomplete="given-name">
+          <span class="input-icon">👤</span>
+        </div>
+        <div class="field-error" id="err-fname">First name is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="lname">Last Name</label>
+        <div class="input-wrap">
+          <input class="form-input" type="text" id="lname" placeholder="Sharma" autocomplete="family-name">
+          <span class="input-icon">👤</span>
+        </div>
+        <div class="field-error" id="err-lname">Last name is required.</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Email Address</label>
+      <div class="input-wrap">
+        <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email" spellcheck="false">
+        <span class="input-icon">✉</span>
+      </div>
+      <div class="field-error" id="err-email">Please enter a valid email address.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="phone">Phone Number (optional)</label>
+      <div class="input-wrap">
+        <input class="form-input" type="tel" id="phone" placeholder="+91 98765 43210" autocomplete="tel">
+        <span class="input-icon">📱</span>
+      </div>
+    </div>
+
+    <!-- HEALTH PROFILE (for user role) -->
+    <div id="health-section">
+      <div class="section-divider">Health Profile</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="age">Age</label>
+          <div class="input-wrap">
+            <input class="form-input" type="number" id="age" placeholder="28" min="16" max="90">
+            <span class="input-icon">🎂</span>
+          </div>
+          <div class="field-error" id="err-age">Please enter a valid age (16–90).</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="gender">Gender</label>
+          <select class="form-select" id="gender">
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="non-binary">Non-binary</option>
+            <option value="prefer-not">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="city">City</label>
+          <div class="input-wrap">
+            <input class="form-input" type="text" id="city" placeholder="Bengaluru">
+            <span class="input-icon">📍</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="state">State</label>
+          <select class="form-select" id="state">
+            <option value="">Select state</option>
+            <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+            <option>Delhi</option><option>Gujarat</option><option>Haryana</option>
+            <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
+            <option>Maharashtra</option><option>Odisha</option><option>Punjab</option>
+            <option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option>
+            <option>Uttar Pradesh</option><option>West Bengal</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFESSIONAL SECTION (for expert roles) -->
+    <div id="professional-section" style="display:none">
+      <div class="section-divider">Professional Details</div>
+      <div class="form-group">
+        <label class="form-label" for="org">Organization / Clinic</label>
+        <div class="input-wrap">
+          <input class="form-input" type="text" id="org" placeholder="e.g. Apollo Hospitals, Infosys">
+          <span class="input-icon">🏥</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="credentials">Credentials / Designation</label>
+        <div class="input-wrap">
+          <input class="form-input" type="text" id="credentials" placeholder="e.g. RD, CSCS, HR Manager">
+          <span class="input-icon">🎓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="section-divider">Security</div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength()">
+        <span class="input-icon">🔒</span>
+        <button class="pwd-toggle" type="button" onclick="togglePwd('password','eye1')" id="eye1">👁</button>
+      </div>
+      <div class="pwd-strength-wrap" id="strength-wrap" style="display:none">
+        <div class="pwd-strength-bar">
+          <div class="strength-seg" id="seg-1"></div>
+          <div class="strength-seg" id="seg-2"></div>
+          <div class="strength-seg" id="seg-3"></div>
+          <div class="strength-seg" id="seg-4"></div>
+        </div>
+        <div class="pwd-strength-label" id="strength-label">Weak</div>
+      </div>
+      <div class="field-error" id="err-password">Password must be at least 8 characters.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="confirm-password">Confirm Password</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="confirm-password" placeholder="Re-enter password" autocomplete="new-password" oninput="checkMatch()">
+        <span class="input-icon">🔒</span>
+        <button class="pwd-toggle" type="button" onclick="togglePwd('confirm-password','eye2')" id="eye2">👁</button>
+      </div>
+      <div class="match-indicator" id="match-ok">✓ Passwords match</div>
+      <div class="field-error" id="err-confirm">Passwords do not match.</div>
+    </div>
+
+    <!-- TERMS -->
+    <label class="terms-row">
+      <input type="checkbox" id="terms-cb">
+      <span class="checkbox-box" id="terms-box"></span>
+      <span class="terms-text">
+        I agree to the <a class="link" href="#">Terms of Service</a> and
+        <a class="link" href="#">Privacy Policy</a>. My health data will be
+        processed securely as per CYRIX's data protection standards.
+      </span>
+    </label>
+    <div class="field-error" id="err-terms" style="margin-top:-12px;margin-bottom:16px;">You must accept the terms to continue.</div>
+
+    <button class="btn-primary" id="reg-btn" onclick="handleRegister()">
+      <div class="btn-content">
+        <div class="btn-spinner" id="btn-spinner"></div>
+        <span class="btn-text" id="btn-label">Create CYRIX Account</span>
+      </div>
+    </button>
+
+  </div>
+
+  <div class="card-footer">
+    Already have an account?
+    <a class="link" href="login.html">Sign in →</a>
+  </div>
+
+  <div class="security-note">
+    <div class="security-dot"></div>
+    Your health data is encrypted and never sold
   </div>
 
 </div>
 
 <script>
-  function validateUsername(val) {
-    const hint = document.getElementById('usernameHint');
-    const input = document.getElementById('username');
-    const valid = /^[a-zA-Z0-9_]{3,24}$/.test(val);
-    const tooShort = val.length > 0 && val.length < 3;
+  const API_BASE = 'http://127.0.0.1:5000/api'; // Must match the origin serving this page to avoid CORS
 
-    if (val.length === 0) {
-      hint.textContent = '3–24 chars · letters, numbers, _';
-      hint.className = 'field-hint';
-      input.classList.remove('valid','invalid');
-    } else if (valid) {
-      hint.textContent = '✓ Username looks good';
-      hint.className = 'field-hint ok';
-      input.classList.add('valid'); input.classList.remove('invalid');
-    } else if (tooShort) {
-      hint.textContent = 'Too short — minimum 3 characters';
-      hint.className = 'field-hint warn';
-      input.classList.add('invalid'); input.classList.remove('valid');
+  // Redirect if already logged in
+  (function() {
+    const token = sessionStorage.getItem('cyrix_token') || localStorage.getItem('cyrix_token');
+    if (token) window.location.replace('/dashboard.html');
+  })();
+
+  let selectedRole = 'user';
+
+  // ── ROLE SELECTION ──
+  function selectRole(el) {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedRole = el.dataset.role;
+
+    const isProfessional = ['diet','fitness','corporate'].includes(selectedRole);
+    document.getElementById('professional-section').style.display = isProfessional ? 'block' : 'none';
+    document.getElementById('health-section').style.display = selectedRole === 'user' ? 'block' : 'none';
+  }
+
+  // ── CHECKBOX ──
+  document.getElementById('terms-cb').addEventListener('change', function() {
+    document.getElementById('terms-box').textContent = this.checked ? '✓' : '';
+    if (this.checked) hideFieldError('err-terms');
+  });
+
+  // ── PASSWORD VISIBILITY ──
+  function togglePwd(inputId, btnId) {
+    const inp = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+
+  // ── PASSWORD STRENGTH ──
+  function checkStrength() {
+    const pw = document.getElementById('password').value;
+    const wrap = document.getElementById('strength-wrap');
+    if (!pw) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const levels = [
+      { label: 'Weak', color: '#e07050' },
+      { label: 'Fair', color: '#f0c060' },
+      { label: 'Good', color: '#e8a835' },
+      { label: 'Strong', color: '#a8cc6a' },
+      { label: 'Very Strong', color: '#7ec850' }
+    ];
+    const lvl = Math.min(score, 4);
+    document.getElementById('strength-label').textContent = levels[lvl].label;
+    document.getElementById('strength-label').style.color = levels[lvl].color;
+
+    for (let i = 1; i <= 4; i++) {
+      const seg = document.getElementById(`seg-${i}`);
+      seg.style.background = i <= lvl + 1 ? levels[lvl].color : 'rgba(255,255,255,0.08)';
+    }
+    checkMatch();
+  }
+
+  // ── PASSWORD MATCH ──
+  function checkMatch() {
+    const p1 = document.getElementById('password').value;
+    const p2 = document.getElementById('confirm-password').value;
+    if (!p2) { document.getElementById('match-ok').className = 'match-indicator'; return; }
+    if (p1 === p2) {
+      document.getElementById('match-ok').className = 'match-indicator ok';
+      hideFieldError('err-confirm');
     } else {
-      hint.textContent = 'Only letters, numbers, and underscores allowed';
-      hint.className = 'field-hint warn';
-      input.classList.add('invalid'); input.classList.remove('valid');
+      document.getElementById('match-ok').className = 'match-indicator';
     }
   }
 
-  function updateStrength(val) {
-    let score = 0;
-    if (val.length >= 8)           score++;
-    if (/[A-Z]/.test(val))        score++;
-    if (/[0-9]/.test(val))        score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
+  // ── FIELD ERROR HELPERS ──
+  function showFieldError(id, msg) {
+    const el = document.getElementById(id);
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+  }
+  function hideFieldError(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show'); // guard against null if ID doesn't exist
+  }
+  function setInputError(id, errId, hasError) {
+    const inp = document.getElementById(id);
+    if (hasError) { inp.classList.add('error'); showFieldError(errId); }
+    else { inp.classList.remove('error'); hideFieldError(errId); }
+  }
 
-    const colors = ['#c85a3a','#d4843a','#e8a835','#7a9e6e'];
-    const labels = ['Weak','Fair','Good','Strong'];
-    const bars   = ['s1','s2','s3','s4'];
-
-    bars.forEach((id, i) => {
-      document.getElementById(id).style.background =
-        i < score ? colors[score - 1] : 'rgba(255,255,255,0.07)';
+  // Clear errors on input — maps input IDs to their matching error element IDs
+  const fieldErrorMap = {
+    'fname':            'err-fname',
+    'lname':            'err-lname',
+    'email':            'err-email',
+    'password':         'err-password',
+    'confirm-password': 'err-confirm',
+    'age':              'err-age',
+  };
+  Object.entries(fieldErrorMap).forEach(([inputId, errId]) => {
+    const el = document.getElementById(inputId);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('error');
+      hideFieldError(errId);
     });
+  });
 
-    const lbl = document.getElementById('strengthLabel');
-    lbl.textContent = val.length === 0 ? '—' : (labels[score - 1] || 'Weak');
-    lbl.style.color = val.length === 0 ? 'var(--muted)' : (colors[score - 1] || colors[0]);
+  // ── ALERTS ──
+  function showError(msg) {
+    document.getElementById('alert-msg').textContent = msg;
+    document.getElementById('alert-error').classList.add('show');
+    document.getElementById('alert-success').classList.remove('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function showSuccess(msg) {
+    document.getElementById('alert-success-msg').textContent = msg;
+    document.getElementById('alert-success').classList.add('show');
+    document.getElementById('alert-error').classList.remove('show');
   }
 
-  function togglePwd() {
-    const inp = document.getElementById('password');
-    const btn = document.getElementById('eyeBtn');
-    if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-    else                         { inp.type = 'password'; btn.textContent = '👁'; }
+  // ── BUTTON STATE ──
+  function setLoading(loading) {
+    const btn = document.getElementById('reg-btn');
+    btn.disabled = loading;
+    document.getElementById('btn-spinner').style.display = loading ? 'block' : 'none';
+    document.getElementById('btn-label').textContent = loading ? 'Creating account...' : 'Create CYRIX Account';
   }
+
+  // ── VALIDATION ──
+  function validateAll() {
+    let valid = true;
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!document.getElementById('fname').value.trim()) {
+      setInputError('fname','err-fname',true); valid = false;
+    }
+    if (!document.getElementById('lname').value.trim()) {
+      setInputError('lname','err-lname',true); valid = false;
+    }
+    if (!emailReg.test(document.getElementById('email').value.trim())) {
+      setInputError('email','err-email',true); valid = false;
+    }
+    if (selectedRole === 'user') {
+      const age = parseInt(document.getElementById('age').value);
+      if (!age || age < 16 || age > 90) {
+        setInputError('age','err-age',true); valid = false;
+      }
+    }
+    const pw = document.getElementById('password').value;
+    if (pw.length < 8) {
+      setInputError('password','err-password',true); valid = false;
+    }
+    if (pw !== document.getElementById('confirm-password').value) {
+      setInputError('confirm-password','err-confirm',true); valid = false;
+    }
+    if (!document.getElementById('terms-cb').checked) {
+      showFieldError('err-terms','You must accept the Terms of Service to continue.'); valid = false;
+    }
+    return valid;
+  }
+
+  // ── MAIN REGISTER HANDLER ──
+  async function handleRegister() {
+    document.getElementById('alert-error').classList.remove('show');
+    if (!validateAll()) return;
+
+    const payload = {
+      firstName: document.getElementById('fname').value.trim(),
+      lastName: document.getElementById('lname').value.trim(),
+      email: document.getElementById('email').value.trim().toLowerCase(),
+      password: document.getElementById('password').value,
+      role: selectedRole,
+      phone: document.getElementById('phone').value.trim() || null,
+    };
+
+    // Append role-specific fields
+    if (selectedRole === 'user') {
+      payload.profile = {
+        age: parseInt(document.getElementById('age').value) || null,
+        gender: document.getElementById('gender').value || null,
+        city: document.getElementById('city').value.trim() || null,
+        state: document.getElementById('state').value || null,
+      };
+    } else {
+      payload.professional = {
+        organization: document.getElementById('org').value.trim() || null,
+        credentials: document.getElementById('credentials').value.trim() || null,
+      };
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409) {
+          showError('An account with this email already exists. Try signing in instead.');
+        } else if (res.status === 422) {
+          showError(data.message || 'Validation error. Please check your inputs.');
+        } else {
+          showError(data.message || 'Registration failed. Please try again.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // ── SUCCESS: auto-login with returned token ──
+      const { token, user } = data;
+      sessionStorage.setItem('cyrix_token', token);
+      sessionStorage.setItem('cyrix_user', JSON.stringify(user));
+
+      showSuccess('Account created successfully! Redirecting to your dashboard...');
+      setTimeout(() => window.location.replace('/dashboard.html'), 1200);
+
+    } catch (err) {
+      showError('Unable to connect to CYRIX servers. Please check your connection.');
+      setLoading(false);
+    }
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
 </script>
 </body>
 </html>
